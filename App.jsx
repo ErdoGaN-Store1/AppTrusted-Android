@@ -162,6 +162,29 @@ const PREMIUM_CSS = `
 .app-shell .scroll-bottom-btn{position:absolute!important;z-index:450!important;bottom:12px!important;left:14px!important;width:42px!important;height:42px!important;display:grid!important;place-items:center!important;border:1px solid #c4b5fd77!important;border-radius:50%!important;background:rgba(78,54,143,.88)!important;color:#fff!important;box-shadow:0 7px 22px #0007!important;backdrop-filter:blur(14px)!important}
 .app-shell .composer-tool{color:#d7caff!important;background:rgba(121,87,245,.2)!important}
 @media(max-width:520px){.app-shell .message{max-width:96%!important}.app-shell .message-content{max-width:calc(100% - 34px)!important}.app-shell .audio-message-wrap{width:min(210px,100%)}.app-shell audio.audio-player{width:min(210px,100%)!important}.app-shell .messages-list{padding-inline:7px!important}}
+/* Telegram-inspired group header, info editor and single-row composer */
+.app-shell .group-chat-heading{display:flex!important;align-items:center!important;gap:10px!important;padding:12px 13px!important;min-height:76px!important;background:linear-gradient(110deg,rgba(35,27,52,.98),rgba(17,16,27,.96))!important;border-bottom:1px solid rgba(170,145,255,.18)!important}
+.app-shell .group-back-button,.app-shell .group-info-button{flex:0 0 40px!important;width:40px!important;height:40px!important;display:grid!important;place-items:center!important;border:1px solid #ffffff14!important;border-radius:50%!important;background:rgba(255,255,255,.045)!important;color:#d8ccff!important}
+.app-shell .group-heading-main{display:flex!important;align-items:center!important;gap:11px!important;flex:1!important;min-width:0!important;text-align:right!important;border:0!important;background:transparent!important;color:#fff!important;padding:0!important}
+.app-shell .group-heading-avatar{width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:50%!important;overflow:hidden!important;display:grid!important;place-items:center!important;background:linear-gradient(145deg,#4c326d,#221b32)!important;border:2px solid #a78bfa99!important;color:#d9ccff!important}
+.app-shell .group-heading-avatar img{width:100%!important;height:100%!important;object-fit:cover!important}
+.app-shell .group-heading-copy{display:flex!important;flex-direction:column!important;gap:4px!important;min-width:0!important;flex:1!important}
+.app-shell .group-heading-copy strong{font-size:15px!important;line-height:1.4!important;color:#fff!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.app-shell .group-heading-copy small{font-size:11px!important;line-height:1.4!important;color:#b8accf!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.app-shell .chat-card{border:0!important;border-radius:18px!important;overflow:hidden!important;background:rgba(12,11,18,.96)!important}
+.app-shell .chat-composer{flex:0 0 auto!important;background:rgba(16,13,25,.97)!important;border-top:1px solid rgba(167,139,250,.2)!important;padding:9px 10px calc(9px + env(safe-area-inset-bottom))!important}
+.app-shell .telegram-composer{display:flex!important;align-items:center!important;gap:7px!important;padding:7px!important;border:1px solid rgba(167,139,250,.3)!important;border-radius:25px!important;background:linear-gradient(145deg,rgba(36,28,53,.96),rgba(20,17,30,.98))!important;box-shadow:inset 0 1px #ffffff0c,0 5px 18px #0003!important;min-height:54px!important}
+.app-shell .telegram-composer input{flex:1!important;min-width:0!important;height:40px!important;padding:0 7px!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;color:#fff!important;font-size:14px!important;outline:none!important}
+.app-shell .telegram-composer input:focus{border:0!important;box-shadow:none!important}
+.app-shell .telegram-composer .composer-tool,.app-shell .telegram-composer .send-button{flex:0 0 39px!important;width:39px!important;min-width:39px!important;height:39px!important;min-height:39px!important;padding:0!important;display:grid!important;place-items:center!important;border-radius:50%!important;background:linear-gradient(145deg,#35264e,#21182f)!important;border:1px solid #a78bfa4d!important;color:#d6c8ff!important;box-shadow:inset 0 1px #ffffff16!important}
+.app-shell .telegram-composer .send-button{background:linear-gradient(145deg,#9b70ff,#7143d5)!important;color:#fff!important;border:1px solid #c7b4ff66!important}
+.app-shell .telegram-composer .composer-tool svg{color:inherit!important;stroke:currentColor!important}
+.app-shell .telegram-composer .voice-composer-button{background:linear-gradient(145deg,#9b70ff,#7143d5)!important;color:white!important}
+.app-shell .telegram-composer .recording-dot{background:linear-gradient(145deg,#ff597a,#b72f64)!important;color:white!important}
+.app-shell .group-settings-backdrop{position:fixed;inset:0;z-index:10030;display:grid;place-items:center;padding:16px;background:rgba(4,3,10,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.app-shell .group-settings-modal{width:min(100%,430px);max-height:92dvh;overflow:auto;border:1px solid #a78bfa4d;border-radius:27px;background:linear-gradient(155deg,#211832,#100d18);box-shadow:0 25px 80px #000b;color:#f8f4ff;padding:16px}
+.app-shell .group-settings-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.app-shell .group-settings-top strong{font-size:16px}.app-shell .group-modal-back{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#ffffff0a;border:1px solid #ffffff18;color:#e4d9ff}.app-shell .group-settings-photo-wrap{display:flex;align-items:center;gap:15px;padding:12px 0 18px;border-bottom:1px solid #ffffff13;margin-bottom:16px}.app-shell .group-settings-photo{width:82px;height:82px;flex:0 0 82px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(145deg,#4c326d,#21182f);border:2px solid #a78bfa88;color:#d9ccff}.app-shell .group-settings-photo img{width:100%;height:100%;object-fit:cover}.app-shell .group-photo-change{display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border-radius:13px;background:#7957f522;border:1px solid #a78bfa55;color:#e7deff;font-size:12px;cursor:pointer}.app-shell .group-settings-form{display:grid;gap:13px}.app-shell .group-settings-form label{display:grid;gap:7px;font-size:12px;color:#d8cfff}.app-shell .group-settings-form input,.app-shell .group-settings-form textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid #ffffff19;border-radius:13px;background:#100d19;color:#fff;padding:12px;font:inherit;font-size:14px;outline:none}.app-shell .group-settings-form input:focus,.app-shell .group-settings-form textarea:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #7957f522}.app-shell .group-settings-form input:disabled,.app-shell .group-settings-form textarea:disabled{opacity:.82}.app-shell .group-settings-form .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;min-height:45px}.app-shell .group-settings-hint{font-size:12px;color:#bdb1d5;line-height:1.8}
+@media(max-width:520px){.app-shell .group-chat-heading{padding:10px!important;gap:7px!important}.app-shell .group-heading-avatar{width:43px!important;height:43px!important;flex-basis:43px!important}.app-shell .group-heading-copy strong{font-size:13px!important}.app-shell .group-back-button,.app-shell .group-info-button{width:36px!important;height:36px!important;flex-basis:36px!important}.app-shell .chat-composer{padding-inline:7px!important}.app-shell .telegram-composer{gap:4px!important;padding:6px!important}.app-shell .telegram-composer .composer-tool,.app-shell .telegram-composer .send-button{flex-basis:35px!important;width:35px!important;min-width:35px!important;height:35px!important;min-height:35px!important}}
 `;
 const ROOMS = [
   // Keep existing room key to preserve messages already stored in Supabase.
@@ -217,6 +240,14 @@ export default function App() {
   const [hiddenMessageIds, setHiddenMessageIds] = useState([]);
   const [replyTo, setReplyTo] = useState(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
+  const DEFAULT_GROUP_SETTINGS = { room: 'orders', name: 'شات تجار ترستد', description: 'المحادثة الجماعية للتجار', avatar_url: '' };
+  const [groupSettings, setGroupSettings] = useState(DEFAULT_GROUP_SETTINGS);
+  const [groupSettingsOpen, setGroupSettingsOpen] = useState(false);
+  const [groupEditName, setGroupEditName] = useState(DEFAULT_GROUP_SETTINGS.name);
+  const [groupEditDescription, setGroupEditDescription] = useState(DEFAULT_GROUP_SETTINGS.description);
+  const [groupEditAvatar, setGroupEditAvatar] = useState('');
+  const [groupAvatarFile, setGroupAvatarFile] = useState(null);
+  const [groupSettingsBusy, setGroupSettingsBusy] = useState(false);
   const longPressTimerRef = useRef(null);
   const [mediaBusy, setMediaBusy] = useState(false);
   const [profiles, setProfiles] = useState([]);
@@ -329,9 +360,76 @@ export default function App() {
   }, [messages, tab]);
 
   useEffect(() => {
+    if (!supabase || !session?.user?.id || !isActive) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from('group_settings')
+        .select('room, name, description, avatar_url').eq('room', 'orders').maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        setNotice(`إعدادات الجروب محتاجة تجهيز قاعدة البيانات مرة واحدة: ${error.message}`);
+        return;
+      }
+      const next = data ? { ...DEFAULT_GROUP_SETTINGS, ...data } : DEFAULT_GROUP_SETTINGS;
+      setGroupSettings(next);
+      setGroupEditName(next.name);
+      setGroupEditDescription(next.description);
+      setGroupEditAvatar(next.avatar_url || '');
+    })();
+    return () => { cancelled = true; };
+  }, [session?.user?.id, isActive]);
+
+  useEffect(() => {
+    if (!groupSettingsOpen) return;
+    setGroupEditName(groupSettings.name || DEFAULT_GROUP_SETTINGS.name);
+    setGroupEditDescription(groupSettings.description || '');
+    setGroupEditAvatar(groupSettings.avatar_url || '');
+    setGroupAvatarFile(null);
+  }, [groupSettingsOpen, groupSettings]);
+
+  useEffect(() => {
     if (!supabase || !isOwner) return;
     loadOwnerData();
   }, [session, isOwner]);
+
+  async function saveGroupSettings(e) {
+    e?.preventDefault?.();
+    if (!supabase || !session?.user?.id || !isOwner) return setNotice('تعديل بيانات الجروب متاح للمالك فقط.');
+    const name = groupEditName.trim();
+    const description = groupEditDescription.trim();
+    if (!name) return setNotice('اكتب اسم الجروب الأول.');
+    setGroupSettingsBusy(true);
+    try {
+      let avatarUrl = groupEditAvatar || '';
+      if (groupAvatarFile) {
+        const ext = groupAvatarFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const path = `${session.user.id}/group-${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from('avatars').upload(path, groupAvatarFile, { upsert: false, contentType: groupAvatarFile.type || 'image/jpeg' });
+        if (uploadError) throw uploadError;
+        avatarUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      }
+      const payload = { room: 'orders', name, description, avatar_url: avatarUrl || null, updated_by: session.user.id, updated_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('group_settings').upsert(payload, { onConflict: 'room' }).select('room, name, description, avatar_url').single();
+      if (error) throw error;
+      setGroupSettings({ ...DEFAULT_GROUP_SETTINGS, ...data });
+      setGroupEditAvatar(data.avatar_url || '');
+      setGroupAvatarFile(null);
+      setGroupSettingsOpen(false);
+      setNotice('تم حفظ اسم الجروب وصورته ووصفه.');
+    } catch (err) {
+      setNotice(`تعذر حفظ إعدادات الجروب: ${err?.message || 'خطأ غير معروف'}`);
+    } finally { setGroupSettingsBusy(false); }
+  }
+
+  function chooseGroupAvatar(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return setNotice('اختار صورة للجروب فقط.');
+    if (file.size > 8 * 1024 * 1024) return setNotice('صورة الجروب لازم تكون أقل من 8 ميجابايت.');
+    setGroupAvatarFile(file);
+    setGroupEditAvatar(URL.createObjectURL(file));
+  }
 
   async function loadMessages(room = tab) {
     if (!supabase || room !== 'orders') return;
@@ -862,7 +960,14 @@ export default function App() {
       {notice && <div className="notice-bar"><CircleHelp size={16}/><span>{notice}</span><button onClick={() => setNotice('')}><X size={15}/></button></div>}
 
       {tab === 'orders' && <section className="chat-card glass">
-        <div className="chat-heading"><div><h2>شات تجار ترستد</h2><p>المحادثة الجماعية</p></div>{isOwner && <span className="owner-chat-tag"><Crown size={14}/> المالك</span>}</div>
+        <div className="chat-heading group-chat-heading">
+          <button type="button" className="group-back-button" onClick={() => setTab('profile')} aria-label="رجوع للصفحة الرئيسية" title="رجوع"><ChevronLeft size={22}/></button>
+          <button type="button" className="group-heading-main" onClick={() => setGroupSettingsOpen(true)} aria-label="عرض وتعديل بيانات الجروب">
+            <span className="group-heading-avatar">{groupSettings.avatar_url ? <img src={groupSettings.avatar_url} alt="صورة الجروب" onError={e => { e.currentTarget.style.display = 'none'; }}/> : <Users size={22}/>}</span>
+            <span className="group-heading-copy"><strong>{groupSettings.name || 'شات تجار ترستد'}</strong><small>{groupSettings.description || 'المحادثة الجماعية للتجار'}</small></span>
+          </button>
+          <button type="button" className="group-info-button" onClick={() => setGroupSettingsOpen(true)} aria-label="إعدادات الجروب" title={isOwner ? 'تعديل بيانات الجروب' : 'بيانات الجروب'}>⋮</button>
+        </div>
         <div className="messages-list" ref={messagesListRef} onScroll={handleMessagesScroll}>
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.filter(m => !hiddenMessageIds.includes(String(m.id))).map(m => {
@@ -895,15 +1000,17 @@ export default function App() {
         </div>
         {actionToast && <div className="chat-action-toast"><CheckCircle2 size={16}/>{actionToast}<button type="button" onClick={() => setActionToast('')} aria-label="إغلاق">×</button></div>}
         {pendingMessageAction && <div className="message-confirm-backdrop" role="presentation"><section className="message-confirm glass" role="dialog" aria-modal="true"><strong>{pendingMessageAction.type === 'delete' ? 'تأكيد حذف الرسالة لدى الجميع؟' : 'تأكيد حذف الرسالة من عندك؟'}</strong><p>{pendingMessageAction.type === 'delete' ? 'الرسالة هتتمسح من الشات عند كل المستخدمين، ومش هتقدر ترجعها.' : 'الرسالة هتختفي من جهازك فقط، وباقي الناس هتفضل شايفاها.'}</p><div><button type="button" className="btn-secondary" onClick={() => setPendingMessageAction(null)}>إلغاء</button><button type="button" className="btn-primary" onClick={confirmMessageAction}><Check size={17}/> تأكيد</button></div></section></div>}
+        <div className="chat-composer">
         {emojiOpen && <div className="emoji-panel" aria-label="لوحة الإيموجي">{CHAT_EMOJIS.map((emoji, index) => <button type="button" key={`${emoji}-${index}`} onClick={() => addEmoji(emoji)} aria-label={`إضافة ${emoji}`}>{emoji}</button>)}</div>}
         {replyTo && <div className="reply-composer-bar"><MessageSquareReply size={16}/><div><strong>الرد على {replyTo.name}</strong><span>{replyTo.preview}</span></div><button type="button" onClick={() => setReplyTo(null)} aria-label="إلغاء الرد"><X size={16}/></button></div>}
-        <div className="composer-tools">
-          <button className="composer-tool" type="button" onClick={() => setEmojiOpen(value => !value)} title="الإيموجي" aria-label="فتح لوحة الإيموجي"><Smile size={19}/></button>
-          <label className="composer-tool" title="إرسال صورة" aria-label="إرسال صورة"><ImagePlus size={19}/><input type="file" accept="image/*" onChange={uploadChatImage} hidden disabled={mediaBusy}/></label>
-          <button className={`composer-tool ${recording ? 'recording-dot' : ''}`} type="button" onClick={recording ? stopVoiceRecording : startVoiceRecording} title={recording ? 'إيقاف التسجيل وإرساله' : 'تسجيل رسالة صوتية'} aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوت'}>{recording ? <Square size={17} fill="currentColor"/> : <Mic size={19}/>}</button>
-          {mediaBusy && <span className="media-status"><LoaderCircle size={14} className="spin"/> جارٍ رفع الملف</span>}
+        <form className="send-form telegram-composer" onSubmit={sendMessage}>
+          <button className="composer-tool emoji-composer-button" type="button" onClick={() => setEmojiOpen(value => !value)} title="الإيموجي" aria-label="فتح لوحة الإيموجي"><Smile size={21}/></button>
+          <input value={messageText} onChange={e => setMessageText(e.target.value)} maxLength={4000} placeholder="اكتب رسالة..." />
+          <label className="composer-tool attachment-composer-button" title="إرسال صورة" aria-label="إرسال صورة"><ImagePlus size={20}/><input type="file" accept="image/*" onChange={uploadChatImage} hidden disabled={mediaBusy}/></label>
+          {messageText.trim() ? <button className="send-button composer-submit-button" type="submit" aria-label="إرسال"><Send size={19}/></button> : <button className={`composer-tool voice-composer-button ${recording ? 'recording-dot' : ''}`} type="button" onClick={recording ? stopVoiceRecording : startVoiceRecording} title={recording ? 'إيقاف التسجيل وإرساله' : 'تسجيل رسالة صوتية'} aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوت'}>{recording ? <Square size={18} fill="currentColor"/> : <Mic size={20}/>}</button>}
+          {mediaBusy && <span className="media-status"><LoaderCircle size={14} className="spin"/> جارٍ الرفع</span>}
+        </form>
         </div>
-        <form className="send-form" onSubmit={sendMessage}><input value={messageText} onChange={e => setMessageText(e.target.value)} maxLength={4000} placeholder="اكتب رسالتك..." /><button className="send-button" disabled={!messageText.trim()} aria-label="إرسال"><Send size={19}/></button></form>
         <div className="retention-note">المحادثة الجماعية · الرسائل محفوظة في قاعدة البيانات.</div>
       </section>}
 
@@ -935,6 +1042,18 @@ export default function App() {
         <h3>طلبات التوثيق ({verificationRequests.length})</h3>
         <div className="owner-list">{verificationRequests.map(req => <div className="owner-row" key={req.id}><div><strong>{req.profiles?.display_name || 'تاجر'}</strong><small>طلب توثيق · {new Date(req.created_at).toLocaleDateString('ar-EG')}</small></div><div className="owner-actions"><button className="mini-approve" onClick={() => reviewVerification(req, true)}>توثيق</button><button className="mini-reject" onClick={() => reviewVerification(req, false)}>رفض</button></div></div>)}</div>
       </section>}
+
+      {groupSettingsOpen && <div className="group-settings-backdrop" role="presentation" onClick={event => { if (event.target === event.currentTarget) setGroupSettingsOpen(false); }}>
+        <section className="group-settings-modal" role="dialog" aria-modal="true" aria-label="إعدادات الجروب">
+          <div className="group-settings-top"><button type="button" className="group-modal-back" onClick={() => setGroupSettingsOpen(false)} aria-label="رجوع"><ChevronLeft size={22}/></button><strong>{isOwner ? 'تعديل بيانات الجروب' : 'بيانات الجروب'}</strong><span /></div>
+          <div className="group-settings-photo-wrap"><div className="group-settings-photo">{groupEditAvatar ? <img src={groupEditAvatar} alt="معاينة صورة الجروب"/> : <Users size={34}/>}</div>{isOwner && <label className="group-photo-change"><Camera size={16}/><span>تغيير الصورة</span><input type="file" accept="image/*" hidden onChange={chooseGroupAvatar}/></label>}</div>
+          <form className="group-settings-form" onSubmit={saveGroupSettings}>
+            <label>اسم الجروب<input value={groupEditName} onChange={event => setGroupEditName(event.target.value)} maxLength={80} disabled={!isOwner} required /></label>
+            <label>وصف الجروب<textarea value={groupEditDescription} onChange={event => setGroupEditDescription(event.target.value)} maxLength={300} rows={3} disabled={!isOwner} placeholder="اكتب وصفًا بسيطًا للجروب" /></label>
+            {isOwner ? <button className="btn-primary" type="submit" disabled={groupSettingsBusy}>{groupSettingsBusy ? <LoaderCircle className="spin" size={17}/> : <Check size={17}/>} {groupSettingsBusy ? 'جارٍ الحفظ...' : 'حفظ التعديلات'}</button> : <p className="group-settings-hint">تعديل اسم الجروب وصورته ووصفه متاح للمالك فقط.</p>}
+          </form>
+        </section>
+      </div>}
 
       {imageDraft && <div className="image-editor-backdrop" role="dialog" aria-modal="true" aria-label="تعديل الصورة قبل الإرسال">
         <section className="image-editor">
