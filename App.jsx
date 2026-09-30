@@ -56,6 +56,12 @@ export default function App() {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
+  const [newTraderName, setNewTraderName] = useState('');
+  const [newTraderEmail, setNewTraderEmail] = useState('');
+  const [newTraderPassword, setNewTraderPassword] = useState('');
+  const [creatingTrader, setCreatingTrader] = useState(false);
+  const [activityTrader, setActivityTrader] = useState(null);
+  const [traderActivity, setTraderActivity] = useState([]);
   const bottomRef = useRef(null);
   const configured = Boolean(supabase);
   const isOwner = profile?.role === 'owner' && profile?.status === 'active';
@@ -276,6 +282,44 @@ export default function App() {
     if (error) setNotice(`تعذر إيقاف الحساب: ${error.message}`);
     else { setNotice('تم إيقاف الحساب.'); loadOwnerData(); }
   }
+  async function createTraderAccount(e) {
+    e.preventDefault();
+    if (!supabase || !isOwner) return setNotice('إنشاء الحساب متاح للمالك فقط.');
+    const name = newTraderName.trim();
+    const traderEmail = newTraderEmail.trim().toLowerCase();
+    if (!name || !traderEmail || newTraderPassword.length < 8) {
+      return setNotice('اكتب اسم التاجر والبريد وكلمة مرور من 8 أحرف على الأقل.');
+    }
+    setCreatingTrader(true);
+    setNotice('جارٍ إنشاء حساب التاجر...');
+    try {
+      const { data, error } = await supabase.functions.invoke('owner-create-trader', {
+        body: { displayName: name, email: traderEmail, password: newTraderPassword }
+      });
+      if (error) throw new Error(error.message || 'تعذر الاتصال بوظيفة إنشاء الحساب');
+      if (data?.error) throw new Error(data.error);
+      setNewTraderName(''); setNewTraderEmail(''); setNewTraderPassword('');
+      setNotice('تم إنشاء حساب التاجر وتفعيله. سلّمه البريد وكلمة المرور بشكل خاص.');
+      await loadOwnerData();
+    } catch (err) {
+      setNotice(`تعذر إنشاء الحساب: ${err?.message || 'خطأ غير معروف'}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`);
+    } finally {
+      setCreatingTrader(false);
+    }
+  }
+
+  async function loadTraderActivity(trader) {
+    setActivityTrader(trader);
+    setTraderActivity([]);
+    const { data, error } = await supabase.from('group_messages')
+      .select('id, room, body, created_at')
+      .eq('sender_id', trader.id)
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (error) setNotice(`تعذر تحميل نشاط التاجر: ${error.message}`);
+    else setTraderActivity(data || []);
+  }
+
   async function reviewVerification(req, approve) {
     const { error: reqError } = await supabase.from('verification_requests').update({
       status: approve ? 'approved' : 'rejected', reviewed_by: session.user.id, reviewed_at: new Date().toISOString()
@@ -387,8 +431,21 @@ export default function App() {
 
       {tab === 'owner' && isOwner && <section className="owner-dashboard glass">
         <div className="dashboard-heading"><div><span className="eyebrow">OWNER CONTROL CENTER</span><h2>إدارة التجار</h2></div><button className="btn-secondary" onClick={loadOwnerData}>تحديث</button></div>
-        <h3>طلبات الحسابات ({profiles.filter(p => p.role === 'trader' && p.status === 'pending').length})</h3>
-        <div className="owner-list">{profiles.filter(p => p.role === 'trader').map(p => <div className="owner-row" key={p.id}><div><strong>{p.display_name}</strong><small>{p.status} · {p.verified ? 'موثّق' : 'غير موثّق'}</small></div><div className="owner-actions">{p.status === 'pending' ? <button className="mini-approve" onClick={() => approveTrader(p.id)}>قبول</button> : p.status === 'active' ? <button className="mini-reject" onClick={() => suspendTrader(p.id)}>إيقاف</button> : null}</div></div>)}</div>
+
+        <h3>إنشاء حساب تاجر جديد</h3>
+        <p className="muted">القسم ده ظاهر للمالك فقط. الحساب بيتنشأ نشطًا وغير موثّق، وتقدر توثّقه بعد المراجعة.</p>
+        <form className="profile-form" onSubmit={createTraderAccount}>
+          <label>اسم التاجر أو المتجر<input value={newTraderName} onChange={e => setNewTraderName(e.target.value)} maxLength={80} required placeholder="اسم التاجر" /></label>
+          <label>البريد الإلكتروني<input type="email" value={newTraderEmail} onChange={e => setNewTraderEmail(e.target.value)} required placeholder="trader@example.com" dir="ltr" /></label>
+          <label>كلمة مرور مؤقتة<input type="password" value={newTraderPassword} onChange={e => setNewTraderPassword(e.target.value)} minLength={8} required placeholder="8 أحرف على الأقل" dir="ltr" /></label>
+          <button className="btn-primary" type="submit" disabled={creatingTrader}>{creatingTrader ? <LoaderCircle className="spin" size={17}/> : <Users size={17}/>} إنشاء حساب التاجر</button>
+        </form>
+
+        <h3>كل التجار ({profiles.filter(p => p.role === 'trader').length})</h3>
+        <div className="owner-list">{profiles.filter(p => p.role === 'trader').map(p => <div className="owner-row" key={p.id}><div><strong>{p.display_name}</strong><small>{p.status} · {p.verified ? 'موثّق' : 'غير موثّق'}</small></div><div className="owner-actions"><button className="btn-secondary" onClick={() => loadTraderActivity(p)}>عرض نشاطه</button>{p.status === 'pending' ? <button className="mini-approve" onClick={() => approveTrader(p.id)}>قبول</button> : p.status === 'active' ? <button className="mini-reject" onClick={() => suspendTrader(p.id)}>إيقاف</button> : null}</div></div>)}</div>
+
+        {activityTrader && <div className="owner-activity"><h3>آخر رسائل {activityTrader.display_name}</h3><p className="muted">آخر 100 رسالة أرسلها في شات الطلبات وشات البيع.</p>{traderActivity.length === 0 ? <p>لا توجد رسائل ظاهرة لهذا التاجر، أو لم يتم تحميلها.</p> : <div className="owner-list">{traderActivity.map(m => <div className="owner-row" key={m.id}><div><strong>{m.room === 'sales' ? 'شات البيع' : 'شات الطلبات'}</strong><p>{m.body}</p><small>{new Date(m.created_at).toLocaleString('ar-EG')}</small></div></div>)}</div>}</div>}
+
         <h3>طلبات التوثيق ({verificationRequests.length})</h3>
         <div className="owner-list">{verificationRequests.map(req => <div className="owner-row" key={req.id}><div><strong>{req.profiles?.display_name || 'تاجر'}</strong><small>طلب توثيق · {new Date(req.created_at).toLocaleDateString('ar-EG')}</small></div><div className="owner-actions"><button className="mini-approve" onClick={() => reviewVerification(req, true)}>توثيق</button><button className="mini-reject" onClick={() => reviewVerification(req, false)}>رفض</button></div></div>)}</div>
       </section>}
