@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   BadgeCheck, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Crown,
   LogIn, LogOut, MessageCircle, Send, ShieldCheck, ShoppingBag, Store,
-  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles
+  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile
 } from 'lucide-react';
 import { supabase } from './supabase.js';
 
@@ -21,15 +21,45 @@ const PREMIUM_CSS = `
 .app-shell .profile-card{background:#12121b!important;border:1px solid var(--premium-line)!important;border-radius:27px!important;box-shadow:0 20px 60px #0005!important}.app-shell .profile-cover{height:190px!important;background:linear-gradient(120deg,#fa3157 0%,#a52d7d 43%,#6f4cf0 100%)!important;overflow:visible!important}.app-shell .profile-cover:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 15%,#ffffff45,transparent 35%),linear-gradient(0deg,#09091030,transparent);pointer-events:none}.app-shell .profile-avatar{right:24px!important;bottom:-45px!important;width:104px!important;height:104px!important;border:5px solid #12121b!important;border-radius:30px!important;background:#272137!important;box-shadow:0 12px 30px #0006!important;color:#cbbfff!important}.app-shell .camera-button{right:101px!important;bottom:-36px!important;width:35px!important;height:35px!important;border:3px solid #12121b!important;border-radius:12px!important;background:linear-gradient(135deg,#ff4569,#7957f5)!important}.app-shell .profile-body{padding:61px 24px 25px!important}.app-shell .profile-body .eyebrow{color:#b7a5ff!important;letter-spacing:2px!important}.app-shell .profile-body h2{font-size:24px!important;display:flex;align-items:center;flex-wrap:wrap;gap:8px!important;color:#fff!important}.app-shell .profile-body h2 .verified-icon,.app-shell .verified-icon{color:#35a7ff!important;filter:drop-shadow(0 0 5px #35a7ff35)}.app-shell .profile-body .muted{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #7957f555;border-radius:20px;background:#7957f518;color:#c9bcff!important;font-size:11px!important}.app-shell .profile-form{margin-top:20px!important;gap:14px!important}.app-shell .profile-form label{color:#e8e5f4!important}.app-shell .profile-form input,.app-shell .profile-form textarea{background:#1b1b27!important;border:1px solid #ffffff16!important;border-radius:14px!important;color:#fff!important;padding:13px!important}.app-shell .profile-form input:focus,.app-shell .profile-form textarea:focus{border-color:#8c73ff!important;outline:none!important;box-shadow:0 0 0 3px #7957f51f!important}.app-shell .btn-primary{background:linear-gradient(120deg,#fa3157,#7957f5)!important;border-radius:14px!important;box-shadow:0 8px 25px #7957f52b!important}.app-shell .btn-secondary{background:#20202c!important;border:1px solid #ffffff16!important;border-radius:13px!important;color:#e9e4ff!important}.app-shell .verify-request{display:flex;align-items:center;justify-content:center;gap:8px;width:100%!important}.app-shell .disclaimer{color:#a3a1b4!important;line-height:1.9!important}
 .app-shell .bottom-dock{width:min(calc(100% - 28px),430px)!important;height:72px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;border-radius:24px!important;background:rgba(21,20,32,.92)!important;border:1px solid #ffffff1a!important;box-shadow:0 15px 50px #0009,0 0 25px #7957f51a!important;backdrop-filter:blur(20px)}.app-shell .bottom-dock button{width:48%!important;height:56px!important;flex-direction:row!important;gap:9px!important;border-radius:17px!important;font-size:12px!important;color:#a6a2b8!important}.app-shell .bottom-dock button svg{width:21px!important;height:21px!important}.app-shell .bottom-dock button.active{color:#fff!important;background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff45!important;box-shadow:0 6px 24px #7957f53d!important}
 @media(max-width:520px){.app-shell .app-main{width:calc(100% - 22px)!important;margin:13px auto!important}.app-shell .welcome-strip{padding:16px!important;border-radius:21px!important}.app-shell .welcome-strip h1{font-size:19px!important}.app-shell .welcome-seal{width:64px!important;height:64px!important}.app-shell .profile-cover{height:165px!important}.app-shell .profile-body{padding:59px 17px 21px!important}.app-shell .profile-body h2{font-size:21px!important}.app-shell .messages-list{height:52vh!important;min-height:250px!important}.app-shell .bottom-dock{width:calc(100% - 24px)!important}}
+/* Chat-first layout */
+.app-shell .welcome-strip,.app-shell .room-tabs{display:none!important}
+.app-shell .app-main{margin-top:12px!important}
+.app-shell .chat-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.app-shell .chat-heading p,.app-shell .chat-heading .live-dot,.app-shell .online-pill{display:none!important}
+.app-shell .messages-list{display:flex;flex-direction:column;direction:ltr;overflow-y:auto;overscroll-behavior:contain}
+.app-shell .message{display:flex;align-items:flex-end;direction:ltr;max-width:88%;align-self:flex-end;flex-direction:row-reverse}
+.app-shell .message .message-content{direction:rtl;text-align:right}
+.app-shell .message.mine{align-self:flex-start;flex-direction:row}
+.app-shell .message-photo{display:block;max-width:min(100%,260px);max-height:300px;border-radius:12px;object-fit:cover}
+.app-shell .composer-tools{display:flex;align-items:center;gap:7px;padding:9px 11px 0;background:#100d17}
+.app-shell .composer-tool{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff12;border-radius:50%;background:#211a2b;color:#e6d8ff}
+.app-shell .emoji-panel{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;padding:10px;background:#191421;border-top:1px solid #ffffff12;max-height:180px;overflow:auto}
+.app-shell .emoji-panel button{font-size:23px;line-height:1.3;padding:3px;border:0;border-radius:8px;background:transparent}
+.app-shell .send-form{display:flex;align-items:center}
+.app-shell .send-form input{direction:rtl;text-align:right;min-width:0;flex:1}
+.app-shell .brand-e{display:grid;place-items:center;font-size:0!important;transform:none!important}
+.app-shell .splash-e{display:grid;place-items:center;width:100px;height:100px;border-radius:30px;font-size:0!important}
+.app-shell .splash-e svg{width:58px;height:58px}
+.auth-screen,.status-screen{background:radial-gradient(ellipse at 50% 10%,#322047 0%,#100d18 45%,#07060b 100%)!important}
+.auth-panel,.status-card{background:linear-gradient(150deg,rgba(27,21,37,.97),rgba(13,11,18,.98))!important;border:1px solid #ffffff13!important;border-radius:27px!important;box-shadow:0 24px 75px #0008,0 0 40px #8b5cf51c!important}
+.brand-e{background:linear-gradient(145deg,#fb7185,#9b5de5 62%,#5b42c7)!important;border:1px solid #ffffff24!important;box-shadow:0 7px 28px #9b5de544!important}
+.brand-word strong{color:#fff!important}.brand-word span{color:#c4b5fd!important}
+.auth-panel h1,.status-card h1{color:#fff!important}.auth-description,.privacy-note{color:#aaa1ba!important}
+.auth-form input{background:#100d17!important;border-color:#393044!important;border-radius:13px!important;color:#fff!important}
+.role-tabs button.selected{background:linear-gradient(135deg,#39234f,#241631)!important;border-color:#a56bce!important}
+.auth-panel .btn-primary{background:linear-gradient(110deg,#fb7185,#a855d8 62%,#7154e8)!important;border-radius:14px!important}
+.owner-chat-tag,.media-status{display:inline-flex;align-items:center;gap:5px;color:#c4b5fd;font-size:10px}
+@media(max-width:520px){.app-shell .message{max-width:94%}.app-shell .emoji-panel{grid-template-columns:repeat(7,minmax(0,1fr))}.app-shell .chat-card{min-height:calc(100dvh - 170px)}.app-shell .messages-list{height:calc(100dvh - 340px);min-height:240px}}
 `;
 const ROOMS = [
-  { id: 'orders', label: 'الطلبات', icon: ShoppingBag, hint: 'طلبات التجار واحتياجاتهم' },
-  { id: 'sales', label: 'البيع', icon: Store, hint: 'العروض والمنتجات المتاحة' }
+  // Keep existing room key to preserve messages already stored in Supabase.
+  { id: 'orders', label: 'شات تجار ترستد', icon: MessageCircle, hint: 'المحادثة الجماعية' }
 ];
+const CHAT_EMOJIS = '😀 😃 😄 😁 😆 😅 😂 🤣 🥹 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😋 😛 😜 🤪 🤔 🫡 🤨 😎 🥳 😏 😢 😭 😤 😡 🤯 😱 🥶 🥵 🤗 🫶 ❤️ 🧡 💛 💚 💙 💜 🖤 🤍 💔 💯 🔥 ✨ ⭐ 🌟 💫 🎉 🎊 🙏 👍 👎 👌 ✌️ 🤝 👏 💪 🫰 👀 💸 💵 🛒 📦 🚀 🏆 ✅ ❌ ⚡ 🎮 🎧 📱 💻 🧠 🐱 🐶 🌹 🌷 🌍 ☕ 🍕 🍔 🍟 🍓 🍉'.split(' ');
 
 function Brand({ compact = false }) {
   return <><style>{PREMIUM_CSS}</style><div className={`brand-lockup ${compact ? 'compact' : ''}`} aria-label="App Trusted Erdogan">
-    <div className="brand-e">AT</div>
+    <div className="brand-e"><ShieldCheck size={compact ? 23 : 29} strokeWidth={2.4}/></div>
     <div className="brand-word"><strong>App Trusted</strong><span>ERDOGAN 🇪🇬</span></div>
   </div></>;
 }
@@ -42,7 +72,7 @@ function Splash({ done }) {
   return <div className="splash">
     <div className="splash-orbit orbit-one" /><div className="splash-orbit orbit-two" />
     <div className="splash-center">
-      <div className="splash-e">AT</div>
+      <div className="splash-e"><ShieldCheck size={58} strokeWidth={2.1}/></div>
       <div className="splash-name">App Trusted</div>
       <div className="splash-store">ERDOGAN 🇪🇬</div>
       <div className="splash-line" />
@@ -65,6 +95,8 @@ export default function App() {
   const [tab, setTab] = useState('orders');
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [mediaBusy, setMediaBusy] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [myVerification, setMyVerification] = useState(false);
@@ -109,7 +141,7 @@ export default function App() {
   useEffect(() => { activeRoomRef.current = tab; }, [tab]);
 
   useEffect(() => {
-    if (!supabase || !session || !isActive || !['orders', 'sales'].includes(tab)) return;
+    if (!supabase || !session || !isActive || tab !== 'orders') return;
     let disposed = false;
     const refresh = () => { if (!disposed) loadMessages(tab); };
     refresh();
@@ -133,10 +165,10 @@ export default function App() {
   }, [session, isOwner]);
 
   async function loadMessages(room = tab) {
-    if (!supabase || !['orders', 'sales'].includes(room)) return;
+    if (!supabase || room !== 'orders') return;
     const { data, error } = await supabase.from('group_messages')
       .select('id, room, body, created_at, sender_id, profiles(display_name, avatar_url, verified)')
-      .eq('room', room).order('created_at', { ascending: true }).limit(300);
+      .in('room', ['orders', 'sales']).order('created_at', { ascending: true }).limit(500);
     if (error) {
       if (activeRoomRef.current === room) setNotice(`تعذر تحميل الشات: ${error.message}`);
     } else if (activeRoomRef.current === room) {
@@ -233,37 +265,67 @@ export default function App() {
     setSession(null); setProfile(null); setMessages([]); setTab('orders');
   }
 
+  async function insertChatBody(body) {
+    if (!supabase || !session || !isActive || !body) return false;
+    const { error } = await supabase.from('group_messages').insert({ room: 'orders', body, sender_id: session.user.id });
+    if (error) { setNotice(`لم تُرسل الرسالة: ${error.message}`); return false; }
+    await loadMessages('orders');
+    return true;
+  }
+
   async function sendMessage(e) {
     e.preventDefault();
-    if (!supabase || !session || !isActive || !messageText.trim()) return;
     const body = messageText.trim();
+    if (!body) return;
     setMessageText('');
-    const { error } = await supabase.from('group_messages').insert({
-      room: tab, body, sender_id: session.user.id
-    });
-    if (error) {
-      setMessageText(body);
-      setNotice(`لم تُرسل الرسالة: ${error.message}`);
-    } else {
-      await loadMessages(tab);
-    }
+    const sent = await insertChatBody(body);
+    if (!sent) setMessageText(body);
+  }
+
+  function addEmoji(emoji) { setMessageText(value => `${value}${emoji}`); }
+
+  async function uploadChatImage(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !supabase || !session) return;
+    if (!file.type.startsWith('image/')) return setNotice('اختار صورة فقط.');
+    if (file.size > 5 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 5 ميجابايت.');
+    setMediaBusy(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const path = `${session.user.id}/chat-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      const sent = await insertChatBody(`__UPTRASID_IMAGE__:${data.publicUrl}`);
+      if (sent) setNotice('تم إرسال الصورة.');
+    } catch (err) {
+      const detail = err?.message || 'خطأ غير معروف';
+      setNotice(`تعذر رفع الصورة: ${detail}. لو ظهرت رسالة bucket أو policy، فالمشكلة في إعدادات Storage في Supabase وليست في شكل الصفحة.`);
+    } finally { setMediaBusy(false); }
   }
 
   async function uploadAvatar(e) {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file || !supabase || !session) return;
     if (!file.type.startsWith('image/')) return setNotice('اختار صورة فقط.');
     if (file.size > 4 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 4 ميجابايت.');
     setAvatarBusy(true);
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const path = `${session.user.id}/avatar-${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
-    if (uploadError) { setNotice(`تعذر رفع الصورة: ${uploadError.message}`); setAvatarBusy(false); return; }
-    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-    const { error } = await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', session.user.id);
-    if (error) setNotice(`تم رفع الصورة لكن تعذر حفظها: ${error.message}`);
-    else setProfile(prev => ({ ...prev, avatar_url: data.publicUrl }));
-    setAvatarBusy(false);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const path = `${session.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      const { error } = await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', session.user.id);
+      if (error) throw error;
+      setProfile(prev => ({ ...prev, avatar_url: data.publicUrl }));
+      setNotice('تم تحديث الصورة الشخصية.');
+    } catch (err) {
+      const detail = err?.message || 'خطأ غير معروف';
+      setNotice(`تعذر رفع الصورة: ${detail}. تأكد أن Storage يحتوي bucket باسم avatars وأن صلاحيات الرفع والقراءة والتحديث مضبوطة.`);
+    } finally { setAvatarBusy(false); }
   }
 
   async function saveProfile(e) {
@@ -279,6 +341,15 @@ export default function App() {
     const { error } = await supabase.from('verification_requests').insert({ user_id: session.user.id, note: 'طلب توثيق من الملف الشخصي' });
     if (error) setNotice(`تعذر إرسال طلب التوثيق: ${error.message}`);
     else { setMyVerification(true); setNotice('تم إرسال طلب التوثيق للمالك. التوثيق لا يعني ضمانًا مطلقًا للصفقات.'); }
+  }
+
+  async function verifyOwnerSelf() {
+    if (!isOwner || !session?.user?.id) return;
+    const { error } = await supabase.from('profiles').update({ verified: true }).eq('id', session.user.id);
+    if (error) return setNotice(`تعذر توثيق حساب المالك: ${error.message}. قد تحتاج سياسة RLS تسمح للمالك النشط بتحديث verified.`);
+    setProfile(prev => ({ ...prev, verified: true }));
+    setNotice('تم توثيق حساب المالك.');
+    await loadOwnerData();
   }
 
   async function approveTrader(id) {
@@ -364,29 +435,26 @@ export default function App() {
     </header>
 
     <main className="app-main">
-      <section className="welcome-strip glass">
-        <div><span className="eyebrow"><span className="live-dot"/> ONLINE TRADERS NETWORK</span><h1>أهلاً، {profile?.display_name || 'تاجر'}</h1><p>مساحتك الخاصة للتواصل وتبادل الطلبات والعروض.</p></div>
-        <div className="welcome-seal"><ShieldCheck size={25}/><span>APP TRUSTED</span><small>ERDOGAN 🇪🇬</small></div>
-      </section>
-
       {notice && <div className="notice-bar"><CircleHelp size={16}/><span>{notice}</span><button onClick={() => setNotice('')}><X size={15}/></button></div>}
 
-      <div className="room-tabs">
-        {ROOMS.map(room => { const Icon = room.icon; return <button key={room.id} className={tab === room.id ? 'active' : ''} onClick={() => setTab(room.id)}><Icon size={18}/><span>{room.label}</span><small>{room.hint}</small></button>; })}
-      </div>
-
-      {(tab === 'orders' || tab === 'sales') && <section className="chat-card glass">
-        <div className="chat-heading"><div><span className="live-dot"/><h2>{tab === 'orders' ? 'شات الطلبات' : 'شات البيع'}</h2><p>رسائل مباشرة محفوظة في قاعدة البيانات</p></div><span className="online-pill"><span className="live-dot"/> مباشر</span></div>
+      {tab === 'orders' && <section className="chat-card glass">
+        <div className="chat-heading"><div><h2>شات تجار ترستد</h2><p>المحادثة الجماعية</p></div>{isOwner && <span className="owner-chat-tag"><Crown size={14}/> المالك</span>}</div>
         <div className="messages-list">
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.map(m => <article className={`message ${m.sender_id === session.user.id ? 'mine' : ''}`} key={m.id}>
             <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div><p>{m.body}</p></div>
+            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy"/></a> : <p>{m.body}</p>}</div>
           </article>)}
           <div ref={bottomRef} />
         </div>
-        <form className="send-form" onSubmit={sendMessage}><input value={messageText} onChange={e => setMessageText(e.target.value)} maxLength={4000} placeholder={tab === 'orders' ? 'اكتب طلبك هنا...' : 'اكتب عرض البيع هنا...'} /><button className="send-button" disabled={!messageText.trim()} aria-label="إرسال"><Send size={19}/></button></form>
-        <div className="retention-note">الرسائل محفوظة حتى تحذفها الإدارة يدويًا. لا توجد عملية حذف أسبوعية مفعّلة.</div>
+        {emojiOpen && <div className="emoji-panel" aria-label="لوحة الإيموجي">{CHAT_EMOJIS.map((emoji, index) => <button type="button" key={`${emoji}-${index}`} onClick={() => addEmoji(emoji)} aria-label={`إضافة ${emoji}`}>{emoji}</button>)}</div>}
+        <div className="composer-tools">
+          <button className="composer-tool" type="button" onClick={() => setEmojiOpen(value => !value)} title="الإيموجي" aria-label="فتح لوحة الإيموجي"><Smile size={19}/></button>
+          <label className="composer-tool" title="إرسال صورة" aria-label="إرسال صورة"><ImagePlus size={19}/><input type="file" accept="image/*" onChange={uploadChatImage} hidden disabled={mediaBusy}/></label>
+          {mediaBusy && <span className="media-status"><LoaderCircle size={14} className="spin"/> جارٍ رفع الصورة</span>}
+        </div>
+        <form className="send-form" onSubmit={sendMessage}><input value={messageText} onChange={e => setMessageText(e.target.value)} maxLength={4000} placeholder="اكتب رسالتك..." /><button className="send-button" disabled={!messageText.trim()} aria-label="إرسال"><Send size={19}/></button></form>
+        <div className="retention-note">المحادثة الجماعية · الرسائل محفوظة في قاعدة البيانات.</div>
       </section>}
 
       {tab === 'profile' && <section className="profile-card glass">
@@ -395,6 +463,7 @@ export default function App() {
         </div>
         <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'تاجر'} · {profile?.verified ? 'حساب موثّق' : 'غير موثّق'}</p>
           <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
+          {isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={verifyOwnerSelf}><BadgeCheck size={17}/> توثيق حساب المالك</button>}
           {!isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={requestVerification}><BadgeCheck size={17}/> طلب توثيق الحساب</button>}
           <p className="disclaimer">التوثيق يوضح أن المالك راجع الحساب فقط، ولا يمثل ضمانًا بنسبة 100% لأي صفقة.</p>
         </div>
@@ -409,7 +478,7 @@ export default function App() {
       </section>}
 
       <nav className="bottom-dock glass" aria-label="التنقل الرئيسي">
-        <button className={['orders', 'sales'].includes(tab) ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
+        <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
         <button className={tab === 'profile' ? 'active' : ''} onClick={() => setTab('profile')}><UserRound/><span>Profile</span></button>
         {isOwner && <button className={tab === 'owner' ? 'active' : ''} onClick={() => {setTab('owner');loadOwnerData();}}><Crown/><span>المالك</span></button>}
       </nav>
