@@ -302,7 +302,15 @@ export default function App() {
       setNotice('تم إنشاء حساب التاجر وتفعيله. سلّمه البريد وكلمة المرور بشكل خاص.');
       await loadOwnerData();
     } catch (err) {
-      setNotice(`تعذر إنشاء الحساب: ${err?.message || 'خطأ غير معروف'}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`);
+      // Edge Function errors often include the useful server message in the response body.
+      let detail = err?.message || 'خطأ غير معروف';
+      try {
+        if (err?.context && typeof err.context.json === 'function') {
+          const payload = await err.context.json();
+          if (payload?.error) detail = payload.error;
+        }
+      } catch { /* Keep the original error message if the response is not JSON. */ }
+      setNotice(`تعذر إنشاء الحساب: ${detail}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`);
     } finally {
       setCreatingTrader(false);
     }
