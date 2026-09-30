@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   BadgeCheck, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Crown,
   LogIn, LogOut, MessageCircle, Send, ShieldCheck, ShoppingBag, Store,
-  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2, Type, Crop, Eraser, PenLine, UserPlus, Globe, MessageSquareReply, ArrowDown
+  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2, Type, Crop, Eraser, PenLine, UserPlus, Globe, MessageSquareReply, ArrowDown, Pause, Settings, Video, Image as ImageIcon, AtSign
 } from 'lucide-react';
 import { supabase } from './supabase.js';
 
@@ -17,9 +17,9 @@ const PREMIUM_CSS = `
 .app-shell .welcome-strip{background:linear-gradient(135deg,rgba(121,87,245,.16),rgba(250,49,87,.07),rgba(255,255,255,.025))!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 18px 50px #0003!important}
 .app-shell .welcome-strip h1{color:#fff!important}.app-shell .welcome-strip p{color:#b5b2c7!important}.app-shell .welcome-seal{background:linear-gradient(145deg,#261d3e,#17131f)!important;border-color:#8068d8!important;color:#c7baff!important;box-shadow:0 0 30px #7957f52a!important}
 .app-shell .room-tabs{display:flex!important;gap:9px!important;margin:16px 0!important}.app-shell .room-tabs button{flex:1;display:flex!important;align-items:center;justify-content:center;gap:8px!important;min-height:48px;padding:12px!important;background:#171720!important;border:1px solid var(--premium-line)!important;border-radius:15px!important;color:#c5c2d3!important;text-align:center!important}.app-shell .room-tabs button span{font-size:12px!important;color:inherit!important}.app-shell .room-tabs button small{display:none!important}.app-shell .room-tabs button svg{color:#b6a5ff!important;grid-row:auto!important}.app-shell .room-tabs button.active{background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff!important;color:#fff!important;box-shadow:0 8px 28px #7957f53d!important}.app-shell .room-tabs button.active svg{color:#fff!important}
-.app-shell .chat-card{background:rgba(19,19,29,.96)!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 20px 55px #0004!important}.app-shell .chat-heading{background:linear-gradient(100deg,rgba(121,87,245,.13),transparent)!important;border-bottom:1px solid var(--premium-line)!important;padding:20px!important}.app-shell .chat-heading h2{color:#fff!important;font-size:17px!important}.app-shell .messages-list{background:radial-gradient(ellipse at 50% 0%,#1c172b55,transparent 65%)!important;padding:18px!important}.app-shell .message-avatar{border-radius:50%!important;background:linear-gradient(145deg,#7957f5,#302047)!important;border:1px solid #ffffff20!important;cursor:pointer}.app-shell .message-content{background:#20202d!important;border:1px solid #ffffff12!important;border-radius:18px 6px 18px 18px!important;padding:11px 13px!important}.app-shell .message.mine .message-content{background:linear-gradient(135deg,#5936b5,#3c2a70)!important;border-color:#a28aff3b!important;border-radius:6px 18px 18px 18px!important}.app-shell .message-meta strong{color:#f6f3ff!important;font-size:11px!important}.app-shell .message-content p{color:#f2efff!important;font-size:13px!important;line-height:1.9!important}.app-shell .send-form{background:#11111a!important;border-top:1px solid var(--premium-line)!important;padding:14px!important}.app-shell .send-form input{background:#20202c!important;border:1px solid #ffffff14!important;border-radius:17px!important;min-height:46px!important;color:#fff!important}.app-shell .send-button{background:linear-gradient(135deg,#ff4569,#7957f5)!important;border-radius:15px!important;min-height:45px!important;box-shadow:0 7px 20px #7957f544!important}
+.app-shell .chat-card{background:rgba(19,19,29,.96)!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 20px 55px #0004!important}.app-shell .chat-heading{background:linear-gradient(100deg,rgba(121,87,245,.13),transparent)!important;border-bottom:1px solid var(--premium-line)!important;padding:20px!important}.app-shell .chat-heading h2{color:#fff!important;font-size:17px!important}.app-shell .messages-list{background:radial-gradient(ellipse at 50% 0%,#1c172b55,transparent 65%)!important;padding:18px!important}.app-shell .message-avatar{appearance:none!important;padding:0!important;margin:0!important;border-radius:50%!important;background:linear-gradient(145deg,#7957f5,#302047)!important;border:1px solid #ffffff20!important;cursor:pointer;overflow:hidden!important;display:grid!important;place-items:center!important;flex:0 0 40px!important}.app-shell .message-content{background:#20202d!important;border:1px solid #ffffff12!important;border-radius:18px 6px 18px 18px!important;padding:11px 13px!important}.app-shell .message.mine .message-content{background:linear-gradient(135deg,#5936b5,#3c2a70)!important;border-color:#a28aff3b!important;border-radius:6px 18px 18px 18px!important}.app-shell .message-meta strong{color:#f6f3ff!important;font-size:11px!important;cursor:pointer}.app-shell .message-content p{color:#f2efff!important;font-size:13px!important;line-height:1.9!important}.app-shell .send-form{background:#11111a!important;border-top:1px solid var(--premium-line)!important;padding:14px!important}.app-shell .send-form input{background:#20202c!important;border:1px solid #ffffff14!important;border-radius:17px!important;min-height:46px!important;color:#fff!important}.app-shell .send-button{background:linear-gradient(135deg,#ff4569,#7957f5)!important;border-radius:15px!important;min-height:45px!important;box-shadow:0 7px 20px #7957f544!important}
 .app-shell .profile-card{background:#12121b!important;border:1px solid var(--premium-line)!important;border-radius:27px!important;box-shadow:0 20px 60px #0005!important}.app-shell .profile-cover{height:190px!important;background:linear-gradient(120deg,#fa3157 0%,#a52d7d 43%,#6f4cf0 100%)!important;overflow:visible!important}.app-shell .profile-cover:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 15%,#ffffff45,transparent 35%),linear-gradient(0deg,#09091030,transparent);pointer-events:none}.app-shell .profile-avatar{right:24px!important;bottom:-45px!important;width:104px!important;height:104px!important;border:5px solid #12121b!important;border-radius:30px!important;background:#272137!important;box-shadow:0 12px 30px #0006!important;color:#cbbfff!important}.app-shell .camera-button{right:101px!important;bottom:-36px!important;width:35px!important;height:35px!important;border:3px solid #12121b!important;border-radius:12px!important;background:linear-gradient(135deg,#ff4569,#7957f5)!important}.app-shell .profile-body{padding:61px 24px 25px!important}.app-shell .profile-body .eyebrow{color:#b7a5ff!important;letter-spacing:2px!important}.app-shell .profile-body h2{font-size:24px!important;display:flex;align-items:center;flex-wrap:wrap;gap:8px!important;color:#fff!important}.app-shell .profile-body h2 .verified-icon,.app-shell .verified-icon{color:#35a7ff!important;filter:drop-shadow(0 0 5px #35a7ff35)}.app-shell .profile-body .muted{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #7957f555;border-radius:20px;background:#7957f518;color:#c9bcff!important;font-size:11px!important}.app-shell .profile-form{margin-top:20px!important;gap:14px!important}.app-shell .profile-form label{color:#e8e5f4!important}.app-shell .profile-form input,.app-shell .profile-form textarea{background:#1b1b27!important;border:1px solid #ffffff16!important;border-radius:14px!important;color:#fff!important;padding:13px!important}.app-shell .profile-form input:focus,.app-shell .profile-form textarea:focus{border-color:#8c73ff!important;outline:none!important;box-shadow:0 0 0 3px #7957f51f!important}.app-shell .btn-primary{background:linear-gradient(120deg,#fa3157,#7957f5)!important;border-radius:14px!important;box-shadow:0 8px 25px #7957f52b!important}.app-shell .btn-secondary{background:#20202c!important;border:1px solid #ffffff16!important;border-radius:13px!important;color:#e9e4ff!important}.app-shell .verify-request{display:flex;align-items:center;justify-content:center;gap:8px;width:100%!important}.app-shell .disclaimer{color:#a3a1b4!important;line-height:1.9!important}
-.app-shell .bottom-dock{width:min(calc(100% - 28px),430px)!important;height:72px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;border-radius:24px!important;background:rgba(21,20,32,.92)!important;border:1px solid #ffffff1a!important;box-shadow:0 15px 50px #0009,0 0 25px #7957f51a!important;backdrop-filter:blur(20px)}.app-shell .bottom-dock button{width:48%!important;height:56px!important;flex-direction:row!important;gap:9px!important;border-radius:17px!important;font-size:12px!important;color:#a6a2b8!important}.app-shell .bottom-dock button svg{width:21px!important;height:21px!important}.app-shell .bottom-dock button.active{color:#fff!important;background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff45!important;box-shadow:0 6px 24px #7957f53d!important}
+.app-shell .bottom-dock{width:min(calc(100% - 28px),430px)!important;height:72px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;border-radius:24px!important;background:rgba(21,20,32,.92)!important;border:1px solid #ffffff1a!important;box-shadow:0 15px 50px #0009,0 0 25px #7957f51a!important;backdrop-filter:blur(20px)}.app-shell .bottom-dock button{flex:1 1 0!important;width:auto!important;min-width:0!important;height:56px!important;flex-direction:row!important;gap:9px!important;border-radius:17px!important;font-size:12px!important;color:#a6a2b8!important}.app-shell .bottom-dock button svg{width:21px!important;height:21px!important}.app-shell .bottom-dock button.active{color:#fff!important;background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff45!important;box-shadow:0 6px 24px #7957f53d!important}
 @media(max-width:520px){.app-shell .app-main{width:calc(100% - 22px)!important;margin:13px auto!important}.app-shell .welcome-strip{padding:16px!important;border-radius:21px!important}.app-shell .welcome-strip h1{font-size:19px!important}.app-shell .welcome-seal{width:64px!important;height:64px!important}.app-shell .profile-cover{height:165px!important}.app-shell .profile-body{padding:59px 17px 21px!important}.app-shell .profile-body h2{font-size:21px!important}.app-shell .messages-list{height:52vh!important;min-height:250px!important}.app-shell .bottom-dock{width:calc(100% - 24px)!important}}
 /* Chat-first layout */
 .app-shell .welcome-strip,.app-shell .room-tabs{display:none!important}
@@ -201,6 +201,16 @@ const PREMIUM_CSS = `
 .app-shell .group-heading-avatar{position:relative!important;overflow:hidden!important;isolation:isolate!important}
 .app-shell .group-heading-avatar img{display:block!important;position:absolute!important;inset:0!important}
 .app-shell .username-field-hint{font-size:11px!important;color:#b9afd0!important;line-height:1.7!important}.app-shell .profile-username-display{display:inline-flex!important;direction:ltr!important;align-items:center!important;margin:7px 0!important;padding:5px 10px!important;border-radius:999px!important;background:#7957f51a!important;border:1px solid #a78bfa33!important;color:#cbbcff!important;font-size:12px!important;max-width:100%!important;overflow-wrap:anywhere!important}
+.app-shell .audio-message-wrap{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:hidden!important;color:inherit!important}
+.app-shell .audio-message-wrap audio{display:none!important}.app-shell .voice-play-button{width:38px!important;height:38px!important;flex:0 0 38px!important;border:1px solid #ffffff24!important;border-radius:50%!important;display:grid!important;place-items:center!important;background:rgba(255,255,255,.12)!important;color:#fff!important}
+.app-shell .voice-track{flex:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:6px!important}
+.app-shell .voice-track-line{height:5px!important;width:100%!important;border-radius:99px!important;background:#ffffff35!important;overflow:hidden!important}
+.app-shell .voice-track-progress{height:100%!important;border-radius:99px!important;background:#c7b5ff!important}
+.app-shell .voice-track-meta{display:flex!important;justify-content:space-between!important;gap:8px!important;font-size:10px!important;color:inherit!important;opacity:.86!important;direction:ltr!important}
+.app-shell .audio-message-label{display:none!important}.app-shell .message-content:has(.audio-message-wrap){width:min(100%,360px)!important;min-width:220px!important;padding:12px!important;box-sizing:border-box!important}
+.app-shell .message.mine .message-content:has(.audio-message-wrap) .voice-track-line{background:#ffffff48!important}.app-shell .profile-media-section{margin-top:24px;padding-top:18px;border-top:1px solid #ffffff14}.app-shell .profile-media-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.app-shell .profile-media-item{position:relative;aspect-ratio:1/1;overflow:hidden;border-radius:13px;background:#211a30;border:1px solid #ffffff14}.app-shell .profile-media-item img,.app-shell .profile-media-item video{width:100%;height:100%;object-fit:cover;display:block}.app-shell .profile-media-upload{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:10px 13px;border:1px solid #a78bfa55;border-radius:13px;background:#7957f522;color:#e7deff;cursor:pointer}.app-shell .username-availability{display:block;font-size:11px;line-height:1.7;margin-top:4px}.app-shell .username-availability.available{color:#86efac}.app-shell .username-availability.taken,.app-shell .username-availability.invalid{color:#fda4af}.app-shell .username-availability.checking{color:#c4b5fd}.app-shell .private-chat-heading{display:flex;align-items:center;gap:10px;padding:12px;background:linear-gradient(110deg,#231b34,#11101b);border-bottom:1px solid #a78bfa2b}.app-shell .private-chat-heading button{border:0;background:transparent;color:#d9ccff}.app-shell .settings-panel,.app-shell .public-profile-card{background:rgba(18,16,28,.96);border:1px solid #a78bfa2e;border-radius:22px;padding:18px;color:#f7f2ff}.app-shell .settings-option{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #ffffff12}.app-shell .settings-option select{max-width:55%;background:#211a30;color:#fff;border:1px solid #a78bfa55;border-radius:10px;padding:9px}.app-shell .private-composer{display:flex;gap:8px;padding:10px;background:#14101e;border-top:1px solid #a78bfa2b}.app-shell .private-composer input{flex:1;min-width:0;background:#211a30;border:1px solid #ffffff18;border-radius:14px;color:white;padding:12px}.app-shell .profile-actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:520px){.app-shell .message-content:has(.audio-message-wrap){min-width:0!important;width:min(100%,300px)!important}.app-shell .profile-media-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.app-shell .bottom-dock button{font-size:10px!important}}
+
 @media(max-width:520px){.app-shell .message-action-popover,.app-shell .message.mine .message-action-popover{bottom:calc(180px + env(safe-area-inset-bottom))!important}.app-shell .audio-message-wrap{width:min(205px,100%)!important}.app-shell .message-reactions{flex-basis:calc(100% - 32px)!important;width:calc(100% - 32px)!important;max-width:calc(100% - 32px)!important;margin-right:32px!important}.app-shell .message.mine .message-reactions{margin-right:0!important;margin-left:32px!important}}
 `;
 const ROOMS = [
@@ -230,6 +240,30 @@ function Splash({ done }) {
       <div className="splash-line" />
     </div>
     <span className="splash-caption">PRIVATE TRADERS NETWORK</span>
+  </div>;
+}
+
+function VoiceMessage({ src }) {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const fmt = value => {
+    if (!Number.isFinite(value) || value < 0) return '0:00';
+    return `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2, '0')}`;
+  };
+  useEffect(() => { setPlaying(false); setCurrent(0); setDuration(0); }, [src]);
+  async function toggle() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      try { await audio.play(); setPlaying(true); } catch { setPlaying(false); }
+    } else { audio.pause(); setPlaying(false); }
+  }
+  return <div className="audio-message-wrap">
+    <audio ref={audioRef} src={src} preload="metadata" onLoadedMetadata={e => setDuration(e.currentTarget.duration || 0)} onTimeUpdate={e => setCurrent(e.currentTarget.currentTime || 0)} onEnded={() => setPlaying(false)} onPause={() => setPlaying(false)} onPlay={() => setPlaying(true)} />
+    <button type="button" className="voice-play-button" onClick={toggle} aria-label={playing ? 'إيقاف الصوت' : 'تشغيل الصوت'}>{playing ? <Pause size={17} fill="currentColor"/> : <Play size={17} fill="currentColor"/>}</button>
+    <div className="voice-track"><div className="voice-track-line"><div className="voice-track-progress" style={{width: `${duration ? Math.min(100, current / duration * 100) : 0}%`}}/></div><div className="voice-track-meta"><span>{fmt(current)}</span><span>{fmt(duration)}</span></div></div>
   </div>;
 }
 
@@ -294,6 +328,15 @@ export default function App() {
   const [editName, setEditName] = useState('');
   const [editUsername, setEditUsername] = useState('');
   const [editBio, setEditBio] = useState('');
+  const [usernameAvailability, setUsernameAvailability] = useState({ status: 'idle', message: '' });
+  const [viewedProfile, setViewedProfile] = useState(null);
+  const [privateChatUser, setPrivateChatUser] = useState(null);
+  const [privateMessages, setPrivateMessages] = useState([]);
+  const [privateText, setPrivateText] = useState('');
+  const [profileMedia, setProfileMedia] = useState([]);
+  const [viewedProfileMedia, setViewedProfileMedia] = useState([]);
+  const [profileMediaBusy, setProfileMediaBusy] = useState(false);
+  const [chatBackground, setChatBackground] = useState('purple');
   const bottomRef = useRef(null);
   const messagesListRef = useRef(null);
   const forceScrollToBottomRef = useRef(false);
@@ -334,6 +377,46 @@ export default function App() {
     loadProfile();
     return () => { cancelled = true; };
   }, [session]);
+
+  useEffect(() => {
+    const clean = editUsername.trim().replace(/^@/, '').toLowerCase();
+    if (!session?.user?.id || !clean) { setUsernameAvailability({ status: 'idle', message: '' }); return; }
+    if (!/^[a-z0-9_]{5,15}$/.test(clean)) { setUsernameAvailability({ status: 'invalid', message: 'اكتب من 5 إلى 15 حرفًا إنجليزيًا أو رقمًا أو _.' }); return; }
+    if (profile?.username && clean === profile.username.toLowerCase()) { setUsernameAvailability({ status: 'available', message: 'ده اسم المستخدم الحالي بتاعك.' }); return; }
+    setUsernameAvailability({ status: 'checking', message: 'بنتأكد إن اسم المستخدم متاح...' });
+    const timer = setTimeout(async () => {
+      const { data, error } = await supabase.rpc('check_username_available', { candidate_username: clean });
+      if (error) {
+        setUsernameAvailability({ status: 'unknown', message: 'مش قادرين نتحقق دلوقتي؛ هنراجع الاسم وقت الحفظ.' });
+      } else if (data === false) {
+        setUsernameAvailability({ status: 'taken', message: 'اسم المستخدم ده مستخدم من قبل، اختار اسم تاني.' });
+      } else {
+        setUsernameAvailability({ status: 'available', message: 'اسم المستخدم متاح ✓' });
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [editUsername, session?.user?.id, profile?.username]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    setChatBackground(localStorage.getItem(`trusted-chat-bg-${session.user.id}`) || 'purple');
+    loadOwnProfileMedia();
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (tab !== 'private' || !privateChatUser?.id || !session?.user?.id) return;
+    let disposed = false;
+    const refresh = async () => {
+      const me = session.user.id, other = privateChatUser.id;
+      const { data, error } = await supabase.from('private_messages').select('id,sender_id,recipient_id,body,created_at')
+        .or(`and(sender_id.eq.${me},recipient_id.eq.${other}),and(sender_id.eq.${other},recipient_id.eq.${me})`)
+        .order('created_at', { ascending: true }).limit(300);
+      if (!disposed && !error) setPrivateMessages(data || []);
+      else if (!disposed && error) setNotice(`تعذر تحميل المحادثة الخاصة: ${error.message}`);
+    };
+    refresh(); const poll = setInterval(refresh, 2500);
+    return () => { disposed = true; clearInterval(poll); };
+  }, [tab, privateChatUser?.id, session?.user?.id]);
 
   const activeRoomRef = useRef(tab);
   useEffect(() => { activeRoomRef.current = tab; }, [tab]);
@@ -571,6 +654,79 @@ export default function App() {
     forceScrollToBottomRef.current = true;
     await loadMessages('orders');
     return true;
+  }
+
+  async function openPublicProfile(userId) {
+    if (!userId) return;
+    if (userId === session?.user?.id) { setTab('profile'); return; }
+    const { data, error } = await supabase.from('profiles').select('id,display_name,username,bio,avatar_url,verified,role,created_at').eq('id', userId).maybeSingle();
+    if (error || !data) { setNotice(`تعذر فتح البروفايل: ${error?.message || 'الحساب غير موجود'}`); return; }
+    setViewedProfile(data);
+    const { data: media } = await supabase.from('profile_media').select('id,user_id,media_url,media_type,caption,created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(60);
+    setViewedProfileMedia(media || []);
+    setTab('public-profile');
+  }
+
+  function openPrivateChat(user = viewedProfile) {
+    if (!user?.id || user.id === session?.user?.id) return;
+    setPrivateChatUser(user); setPrivateMessages([]); setPrivateText(''); setTab('private');
+  }
+
+  async function sendPrivateMessage(event) {
+    event.preventDefault();
+    const body = privateText.trim();
+    if (!body || !privateChatUser?.id) return;
+    setPrivateText('');
+    const { error } = await supabase.from('private_messages').insert({ sender_id: session.user.id, recipient_id: privateChatUser.id, body });
+    if (error) { setPrivateText(body); setNotice(`تعذر إرسال الرسالة الخاصة: ${error.message}`); return; }
+    const { data } = await supabase.from('private_messages').select('id,sender_id,recipient_id,body,created_at').or(`and(sender_id.eq.${session.user.id},recipient_id.eq.${privateChatUser.id}),and(sender_id.eq.${privateChatUser.id},recipient_id.eq.${session.user.id})`).order('created_at', { ascending: true }).limit(300);
+    setPrivateMessages(data || []);
+  }
+
+  async function loadOwnProfileMedia() {
+    if (!session?.user?.id || !supabase) return;
+    const { data, error } = await supabase.from('profile_media').select('id,user_id,media_url,media_type,caption,created_at').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(60);
+    if (!error) setProfileMedia(data || []);
+  }
+
+  async function uploadProfileMedia(event) {
+    const file = event.target.files?.[0]; event.target.value = '';
+    if (!file) return;
+    const isImage = file.type.startsWith('image/'), isVideo = file.type.startsWith('video/');
+    if (!isImage && !isVideo) return setNotice('اختار صورة أو فيديو فقط.');
+    if (file.size > 10 * 1024 * 1024) return setNotice('حجم الصورة أو الفيديو لازم يكون أقل من 10 ميجابايت.');
+    setProfileMediaBusy(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || (isVideo ? 'mp4' : 'jpg');
+      const path = `${session.user.id}/profile-media-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const mediaUrl = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      const { error } = await supabase.from('profile_media').insert({ user_id: session.user.id, media_url: mediaUrl, media_type: isVideo ? 'video' : 'image', caption: '' });
+      if (error) throw error;
+      await loadOwnProfileMedia(); setNotice('تم نشر الملف في بروفايلك.');
+    } catch (err) { setNotice(`تعذر نشر الصورة أو الفيديو: ${err?.message || 'خطأ غير معروف'}. تأكد من تنفيذ ملف SQL الجديد وصلاحيات Storage.`); }
+    finally { setProfileMediaBusy(false); }
+  }
+
+  function selectChatBackground(value) {
+    setChatBackground(value);
+    if (session?.user?.id) localStorage.setItem(`trusted-chat-bg-${session.user.id}`, value);
+  }
+
+  async function uploadChatBackground(event) {
+    const file = event.target.files?.[0]; event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return setNotice('خلفية الشات لازم تكون صورة.');
+    if (file.size > 8 * 1024 * 1024) return setNotice('حجم الخلفية لازم يكون أقل من 8 ميجابايت.');
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const path = `${session.user.id}/chat-background-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const url = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      selectChatBackground(`url:${url}`); setNotice('تم حفظ خلفية الشات على جهازك.');
+    } catch (err) { setNotice(`تعذر رفع الخلفية: ${err?.message || 'خطأ غير معروف'}`); }
   }
 
   function getReplyPreview(message) {
@@ -851,6 +1007,9 @@ export default function App() {
       setNotice('اسم المستخدم لازم يكون من 5 إلى 15 حرفًا أو رقمًا إنجليزيًا، ومسموح بالشرطة السفلية _ فقط.');
       return;
     }
+    if (usernameAvailability.status === 'taken') { setNotice('اسم المستخدم ده مستخدم من قبل، اختار اسم تاني.'); return; }
+    const { data: usernameIsAvailable, error: checkUsernameError } = await supabase.rpc('check_username_available', { candidate_username: username });
+    if (!checkUsernameError && usernameIsAvailable === false) { setUsernameAvailability({ status: 'taken', message: 'اسم المستخدم ده مستخدم من قبل، اختار اسم تاني.' }); setNotice('اسم المستخدم ده مستخدم من قبل، اختار اسم تاني.'); return; }
     const { error } = await supabase.from('profiles').update({
       display_name: editName.trim(), username, bio: editBio.trim()
     }).eq('id', session.user.id);
@@ -998,7 +1157,7 @@ export default function App() {
           </button>
           <button type="button" className="group-info-button" onClick={() => setGroupSettingsOpen(true)} aria-label="إعدادات الجروب" title={isOwner ? 'تعديل بيانات الجروب' : 'بيانات الجروب'}>⋮</button>
         </div>
-        <div className="messages-list" ref={messagesListRef} onScroll={handleMessagesScroll}>
+        <div className="messages-list" ref={messagesListRef} onScroll={handleMessagesScroll} style={chatBackground.startsWith('url:') ? { backgroundImage: `linear-gradient(#100b1bb8,#100b1bd4),url(${chatBackground.slice(4)})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: chatBackground === 'midnight' ? '#080b16' : chatBackground === 'plum' ? '#25152b' : 'radial-gradient(ellipse at 50% 0%,#2a1b40,#100d18 70%)' }}>
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.filter(m => !hiddenMessageIds.includes(String(m.id))).map(m => {
             const mine = m.sender_id === session.user.id;
@@ -1012,8 +1171,8 @@ export default function App() {
             return <article className={`message ${mine ? 'mine' : ''} ${messageMenu?.id === m.id ? 'message-menu-active' : ''}`} key={m.id}
               onTouchStart={() => beginMessageLongPress(m.id)} onTouchEnd={endMessageLongPress} onTouchMove={endMessageLongPress}
               onContextMenu={event => { event.preventDefault(); openMessageMenu(m.id); }}>
-              <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-              <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a className="message-photo-link" href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <div className="audio-message-wrap"><span className="audio-message-label"><Mic size={14}/> رسالة صوتية</span><audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /></div> : typeof m.body === 'string' && m.body.startsWith('↪ رد على ') && m.body.includes('\n\n') ? <div className="reply-message-content"><div className="reply-message-quote">{m.body.split('\n\n')[0]}</div><p>{m.body.slice(m.body.indexOf('\n\n') + 2)}</p></div> : <p>{m.body}</p>}</div>
+              <button type="button" className="message-avatar" onClick={() => openPublicProfile(m.sender_id)} aria-label={`فتح بروفايل ${m.profiles?.display_name || 'تاجر'}`}>{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</button>
+              <div className="message-content"><div className="message-meta"><strong onClick={() => openPublicProfile(m.sender_id)} role="button" tabIndex={0}>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a className="message-photo-link" href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <VoiceMessage src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : typeof m.body === 'string' && m.body.startsWith('↪ رد على ') && m.body.includes('\n\n') ? <div className="reply-message-content"><div className="reply-message-quote">{m.body.split('\n\n')[0]}</div><p>{m.body.slice(m.body.indexOf('\n\n') + 2)}</p></div> : <p>{m.body}</p>}</div>
               {Object.keys(reactions).length > 0 && <div className="message-reactions">{Object.entries(reactions).map(([emoji, data]) => <button key={emoji} type="button" className={`reaction-chip ${data.mine ? 'mine-reaction' : ''}`} onClick={() => reactToMessage(m, emoji)}>{emoji}<small>{data.count}</small></button>)}</div>}
               {messageMenu?.id === m.id && <div className="message-action-popover" onTouchStart={event => event.stopPropagation()} onContextMenu={event => event.stopPropagation()}>
                 <div className="quick-reactions">{QUICK_REACTIONS.map(emoji => <button type="button" key={emoji} onClick={() => reactToMessage(m, emoji)} aria-label={`رياكت ${emoji}`}>{emoji}</button>)}<button type="button" className="reaction-more" onClick={() => setReactionPickerOpen(value => !value)} aria-label="المزيد من الإيموجي">＋</button></div>
@@ -1049,14 +1208,36 @@ export default function App() {
           <label className="camera-button" title="تغيير الصورة">{avatarBusy ? <LoaderCircle className="spin"/> : <Camera size={17}/>}<input type="file" accept="image/*" onChange={uploadAvatar} hidden /></label>
         </div>
         <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'عضو'} · {profile?.verified ? 'حساب موثّق' : 'حساب غير موثّق'}</p><p className="profile-username-display" dir="ltr">@{profile?.username || 'username'}</p>
-          <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>اسم المستخدم<input value={editUsername} onChange={e => setEditUsername(e.target.value.replace(/[^a-zA-Z0-9_@]/g, '').replace(/^@+/, '').slice(0,15))} minLength={5} maxLength={15} autoCapitalize="none" autoCorrect="off" spellCheck={false} dir="ltr" placeholder="username_123" required /><span className="username-field-hint">من 5 إلى 15 حرفًا إنجليزيًا أو رقمًا، ومسموح بالشرطة السفلية _. لازم يكون فريدًا وغير مستخدم من شخص آخر.</span></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
+          <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>اسم المستخدم<input value={editUsername} onChange={e => setEditUsername(e.target.value.replace(/[^a-zA-Z0-9_@]/g, '').replace(/^@+/, '').slice(0,15))} minLength={5} maxLength={15} autoCapitalize="none" autoCorrect="off" spellCheck={false} dir="ltr" placeholder="username_123" required /><span className="username-field-hint">من 5 إلى 15 حرفًا إنجليزيًا أو رقمًا، ومسموح بالشرطة السفلية _.</span><span className={`username-availability ${usernameAvailability.status}`} aria-live="polite">{usernameAvailability.message}</span></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
           {isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={verifyOwnerSelf}><BadgeCheck size={17}/> توثيق حساب المالك</button>}
           {!isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={requestVerification}><BadgeCheck size={17}/> طلب توثيق الحساب</button>}
           <div className="profile-socials">{socialLinks.map(link => { const value = link.value || ''; const clean = value.replace(/^@/, ''); const href = value.startsWith('http') ? value : link.platform === 'WhatsApp' ? `https://wa.me/${value.replace(/[^0-9]/g, '')}` : link.platform === 'Telegram' ? `https://t.me/${clean}` : link.platform === 'TikTok' ? `https://www.tiktok.com/@${clean}` : link.platform === 'Facebook' ? `https://www.facebook.com/${clean}` : `https://www.instagram.com/${clean}`; const colors = { WhatsApp:'#168b52', Telegram:'#168fca', TikTok:'#24212d', Facebook:'#1769d2', Instagram:'#a53a9a' }; return <a key={link.platform} className="social-chip" style={{background:colors[link.platform] || '#343044'}} href={href} target="_blank" rel="noreferrer">{link.platform === 'WhatsApp' ? '🟢' : link.platform === 'Telegram' ? '✈️' : link.platform === 'TikTok' ? '♪' : link.platform === 'Facebook' ? 'f' : '◎'} {link.platform}</a>; })}</div>
           <div className="social-editor"><button type="button" className="btn-secondary" onClick={() => setSocialEditorOpen(value => !value)}>{socialEditorOpen ? 'إغلاق' : '＋ إضافة موقع للتواصل'}</button>{socialEditorOpen && <><div className="social-row"><select value={socialPlatform} onChange={e => setSocialPlatform(e.target.value)}><option>WhatsApp</option><option>Telegram</option><option>TikTok</option><option>Facebook</option><option>Instagram</option></select><input value={socialValue} onChange={e => setSocialValue(e.target.value)} placeholder={socialPlatform === 'WhatsApp' ? 'رقم دولي بدون +' : 'رابط حسابك أو اسم المستخدم'} dir="ltr" /></div><button type="button" className="btn-primary" onClick={addSocialLink}>حفظ وسيلة التواصل</button></>}{socialLinks.length > 0 && <div className="social-row">{socialLinks.map(link => <button type="button" key={link.platform} className="btn-secondary" onClick={() => removeSocialLink(link.platform)}><Trash2 size={14}/> حذف {link.platform}</button>)}</div>}</div>
+          <section className="profile-media-section"><h3>الصور والفيديوهات</h3><p className="muted">شارك صورًا وفيديوهات من نشاطك التجاري.</p><label className="profile-media-upload"><ImagePlus size={17}/>{profileMediaBusy ? 'جارٍ الرفع...' : 'إضافة صورة أو فيديو'}<input type="file" accept="image/*,video/*" hidden onChange={uploadProfileMedia} disabled={profileMediaBusy}/></label><div className="profile-media-grid">{profileMedia.filter(item => item.user_id === session.user.id).map(item => <div className="profile-media-item" key={item.id}>{item.media_type === 'video' ? <video src={item.media_url} controls preload="metadata"/> : <a href={item.media_url} target="_blank" rel="noreferrer"><img src={item.media_url} alt="منشور في البروفايل" loading="lazy"/></a>}</div>)}</div></section>
           <p className="disclaimer">التوثيق يوضح أن المالك راجع الحساب فقط، ولا يمثل ضمانًا بنسبة 100% لأي صفقة.</p>
         </div>
       </section>}
+
+      {tab === 'public-profile' && viewedProfile && <section className="public-profile-card">
+        <div className="dashboard-heading"><button type="button" className="btn-secondary" onClick={() => setTab('orders')}><ChevronLeft size={17}/> رجوع للشات</button><span className="eyebrow">TRADER PROFILE</span></div>
+        <div className="profile-avatar" style={{position:'relative',right:'auto',bottom:'auto',margin:'22px auto 12px',width:104,height:104,borderRadius:'50%',overflow:'hidden'}}>{viewedProfile.avatar_url ? <img src={viewedProfile.avatar_url} alt="الصورة الشخصية" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : <UserRound size={38}/>}</div>
+        <h2 style={{textAlign:'center'}}>{viewedProfile.display_name || 'تاجر'} {viewedProfile.verified && <BadgeCheck className="verified-icon"/>}</h2>
+        {viewedProfile.username && <p className="profile-username-display" dir="ltr">@{viewedProfile.username}</p>}
+        <p style={{textAlign:'center',color:'#c4b5fd',lineHeight:1.8}}>{viewedProfile.bio || 'لا توجد نبذة مضافة.'}</p>
+        <div className="profile-actions-row"><button type="button" className="btn-primary" onClick={() => openPrivateChat(viewedProfile)}><MessageCircle size={17}/> دردشة خاصة</button></div>
+        <section className="profile-media-section"><h3>الصور والفيديوهات</h3><div className="profile-media-grid">{viewedProfileMedia.map(item => <div className="profile-media-item" key={item.id}>{item.media_type === 'video' ? <video src={item.media_url} controls preload="metadata"/> : <a href={item.media_url} target="_blank" rel="noreferrer"><img src={item.media_url} alt="منشور" loading="lazy"/></a>}</div>)}</div>{!viewedProfileMedia.length && <p className="group-settings-hint">لا توجد منشورات حتى الآن.</p>}</section>
+      </section>}
+
+      {tab === 'private' && privateChatUser && <section className="chat-card glass">
+        <div className="private-chat-heading"><button type="button" onClick={() => setTab('orders')} aria-label="رجوع"><ChevronLeft size={22}/></button><button type="button" className="group-heading-main" onClick={() => openPublicProfile(privateChatUser.id)}><span className="group-heading-avatar">{privateChatUser.avatar_url ? <img src={privateChatUser.avatar_url} alt=""/> : <UserRound size={20}/>}</span><span className="group-heading-copy"><strong>{privateChatUser.display_name || 'تاجر'}</strong><small>دردشة خاصة</small></span></button></div>
+        <div className="messages-list" style={chatBackground.startsWith('url:') ? {backgroundImage:`linear-gradient(#100b1bb8,#100b1bd4),url(${chatBackground.slice(4)})`,backgroundSize:'cover',backgroundPosition:'center'} : {background: chatBackground === 'midnight' ? '#080b16' : chatBackground === 'plum' ? '#25152b' : 'radial-gradient(ellipse at 50% 0%,#2a1b40,#100d18 70%)'}}>
+          {privateMessages.map(message => <article key={message.id} className={`message ${message.sender_id === session.user.id ? 'mine' : ''}`}><div className="message-content"><div className="message-meta"><strong>{message.sender_id === session.user.id ? (profile?.display_name || 'أنت') : (privateChatUser.display_name || 'التاجر')}</strong><time>{new Date(message.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div><p>{message.body}</p></div></article>)}
+          {!privateMessages.length && <div className="empty-chat"><MessageCircle size={28}/><strong>ابدأ محادثة خاصة</strong><span>الرسائل هنا بينك وبين التاجر ده فقط.</span></div>}
+        </div>
+        <form className="private-composer" onSubmit={sendPrivateMessage}><input value={privateText} onChange={event => setPrivateText(event.target.value)} placeholder="اكتب رسالة خاصة..." maxLength={4000}/><button className="send-button" type="submit" disabled={!privateText.trim()}><Send size={18}/></button></form>
+      </section>}
+
+      {tab === 'settings' && <section className="settings-panel"><span className="eyebrow">SETTINGS</span><h2>الإعدادات</h2><div className="settings-option"><div><strong>خلفية الشات</strong><p className="group-settings-hint">اختار لونًا أو ارفع خلفية من جهازك.</p></div><select value={chatBackground.startsWith('url:') ? 'custom' : chatBackground} onChange={event => selectChatBackground(event.target.value)}><option value="purple">بنفسجي</option><option value="plum">برقوقي داكن</option><option value="midnight">ليلي</option><option value="custom" disabled>صورة مخصصة</option></select></div><label className="profile-media-upload"><ImagePlus size={17}/> رفع خلفية من الجهاز<input type="file" accept="image/*" hidden onChange={uploadChatBackground}/></label><p className="group-settings-hint">الخلفية بتتطبق على جهازك فقط. تقدر تغيرها في أي وقت.</p></section>}
 
       {tab === 'owner' && isOwner && <section className="owner-dashboard glass">
         <div className="dashboard-heading"><div><span className="eyebrow">OWNER CONTROL CENTER</span><h2>إدارة التجار</h2></div><button className="btn-secondary" onClick={loadOwnerData}>تحديث</button></div>
@@ -1105,8 +1286,9 @@ export default function App() {
       </div>}
 
       <nav className="bottom-dock glass" aria-label="التنقل الرئيسي">
-        <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
+        <button className={tab === 'orders' || tab === 'private' || tab === 'public-profile' ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
         <button className={tab === 'profile' ? 'active' : ''} onClick={() => setTab('profile')}><UserRound/><span>Profile</span></button>
+        <button className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}><Settings/><span>الإعدادات</span></button>
         {isOwner && <button className={tab === 'owner' ? 'active' : ''} onClick={() => {setTab('owner');loadOwnerData();}}><Crown/><span>المالك</span></button>}
       </nav>
     </main>
