@@ -51,8 +51,8 @@ const PREMIUM_CSS = `
 .owner-chat-tag,.media-status{display:inline-flex;align-items:center;gap:5px;color:#c4b5fd;font-size:10px}
 .image-editor-backdrop{position:fixed;inset:0;z-index:9999;background:#05040beF;display:grid;place-items:center;padding:12px}.image-editor{width:min(100%,720px);max-height:94dvh;overflow:auto;background:#15131f;border:1px solid #ffffff20;border-radius:22px;padding:14px;color:#fff;box-shadow:0 25px 80px #000b}.image-editor-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.image-editor-preview{position:relative;display:grid;place-items:center;max-height:58dvh;min-height:180px;background:#08080d;border-radius:14px;overflow:hidden}.image-editor-preview img{display:block;max-width:100%;max-height:58dvh;object-fit:contain}.image-editor-preview canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.image-editor-tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.image-editor-tools button,.image-editor-tools select,.image-editor-tools input{border:1px solid #ffffff20;background:#252132;color:#fff;border-radius:10px;padding:9px;font-size:12px}.image-editor-tools button.selected{background:#6844cc;border-color:#b5a2ff}.image-editor-actions{display:flex;gap:9px}.image-editor-actions button{flex:1;min-height:44px}.owner-create-form{display:grid;grid-template-columns:1fr;gap:10px;padding:15px;margin:14px 0 20px;background:#1b1825;border:1px solid #ffffff14;border-radius:17px}.owner-create-form input{width:100%;padding:12px;border-radius:11px;background:#100d17;color:#fff;border:1px solid #393044}.owner-create-form h3{margin:0}.app-shell .message-photo{background:#252132;min-height:35px}.app-shell .message-photo:after{content:''}@media(max-width:520px){.app-shell .message{max-width:94%}.app-shell .emoji-panel{grid-template-columns:repeat(7,minmax(0,1fr))}.app-shell .chat-card{min-height:calc(100dvh - 170px)}.app-shell .messages-list{height:calc(100dvh - 340px);min-height:240px}}
 .app-shell .profile-cover{position:relative!important}
-.app-shell .profile-avatar{right:50%!important;transform:translateX(50%)!important;bottom:-48px!important;border-radius:50%!important;width:112px!important;height:112px!important}
-.app-shell .camera-button{right:calc(50% - 68px)!important;bottom:-37px!important}
+.app-shell .profile-avatar{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:-48px!important;border-radius:50%!important;width:112px!important;height:112px!important}
+.app-shell .camera-button{left:calc(50% + 28px)!important;right:auto!important;bottom:-37px!important}
 .app-shell .banner-upload{position:absolute;top:12px;left:12px;z-index:3;display:flex;align-items:center;gap:6px;background:#11111acc;border:1px solid #ffffff30;color:white;border-radius:12px;padding:9px 11px;font-size:12px;cursor:pointer}
 .app-shell .profile-socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .app-shell .social-chip{display:inline-flex;align-items:center;gap:7px;border-radius:13px;padding:9px 12px;text-decoration:none;color:white!important;font-size:12px;border:1px solid #ffffff20}
@@ -61,7 +61,27 @@ const PREMIUM_CSS = `
 .app-shell .social-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .app-shell .audio-player{width:220px;max-width:100%;height:38px}
 .app-shell .recording-dot{color:#ff5475!important}
-@media(max-width:520px){.app-shell .profile-avatar{width:98px!important;height:98px!important;bottom:-43px!important}.app-shell .camera-button{right:calc(50% - 61px)!important;bottom:-34px!important}.app-shell .profile-body{padding-top:59px!important}}
+@media(max-width:520px){.app-shell .profile-avatar{width:98px!important;height:98px!important;bottom:-43px!important}.app-shell .camera-button{left:calc(50% + 23px)!important;right:auto!important;bottom:-34px!important}.app-shell .profile-body{padding-top:59px!important}}
+/* Final mobile fixes: full-width owner form, centered profile photo, stable chat scroll. */
+.app-shell,.app-shell *{box-sizing:border-box}
+.app-shell .owner-dashboard{width:100%;min-width:0;overflow:hidden}
+.app-shell .owner-create-form{width:100%;min-width:0;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);direction:rtl}
+.app-shell .owner-create-form input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;text-align:right;direction:rtl}
+.app-shell .owner-create-form input[type=email],.app-shell .owner-create-form input[type=password]{direction:ltr;text-align:left}
+.app-shell .messages-list{overflow-anchor:none!important;scroll-behavior:auto!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important}
+.app-shell .chat-card{min-width:0;overflow:hidden}
+.app-shell .message{min-width:0}
+.app-shell .message-content{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+.app-shell .message-photo{height:auto;object-fit:contain}
+.app-shell .profile-cover{overflow:visible!important}
+.app-shell .profile-body{min-width:0;overflow-wrap:anywhere}
+.app-shell .profile-form{display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%!important;min-width:0!important}
+.app-shell .profile-form label{display:block!important;width:100%!important;min-width:0!important}
+.app-shell .profile-form input,.app-shell .profile-form textarea{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.app-shell button.composer-tool,.app-shell label.composer-tool{appearance:none!important;-webkit-appearance:none!important;background:#211a2b!important;color:#e6d8ff!important;border:1px solid #ffffff22!important;box-shadow:none!important;border-radius:50%!important}
+.app-shell .composer-tools{direction:rtl!important;background:#100d17!important;border-top:1px solid #ffffff12!important}
+.app-shell .send-form{direction:rtl!important}
+@media(max-width:520px){.app-shell .owner-dashboard{padding:15px!important}.app-shell .owner-create-form{padding:12px!important}.app-shell .chat-card{height:calc(100dvh - 184px);min-height:390px;display:flex;flex-direction:column}.app-shell .messages-list{flex:1 1 auto;height:auto!important;min-height:0!important;max-height:none!important}.app-shell .composer-tools,.app-shell .send-form{flex-shrink:0}.app-shell .bottom-dock{z-index:1000}}
 
 `;
 const ROOMS = [
@@ -207,7 +227,15 @@ export default function App() {
     if (error) {
       if (activeRoomRef.current === room) setNotice(`تعذر تحميل الشات: ${error.message}`);
     } else if (activeRoomRef.current === room) {
-      setMessages(data || []);
+      const nextMessages = data || [];
+      // Keep the same array when polling returns the same messages so React does not
+      // unnecessarily rebuild the scroll area and disturb the user's scroll position.
+      setMessages(previous => {
+        if (previous.length === nextMessages.length && previous.every((item, index) =>
+          item.id === nextMessages[index]?.id && item.body === nextMessages[index]?.body && item.created_at === nextMessages[index]?.created_at
+        )) return previous;
+        return nextMessages;
+      });
     }
   }
 
@@ -501,11 +529,23 @@ export default function App() {
     setCreatingTrader(true); setNotice('جارٍ إنشاء حساب التاجر...');
     try {
       const {data,error}=await supabase.functions.invoke('owner-create-trader',{body:{displayName:name,email:traderEmail,password:newTraderPassword}});
-      if(error) throw new Error(error.message || 'تعذر الاتصال بوظيفة إنشاء الحساب');
+      if(error) {
+        let detail = '';
+        // Supabase hides the JSON response behind error.context for non-2xx Edge Function responses.
+        try {
+          const response = error.context;
+          if (response && typeof response.clone === 'function') {
+            const payload = await response.clone().json();
+            detail = payload?.error || payload?.message || '';
+          }
+        } catch (_) {}
+        throw new Error(detail || error.message || 'تعذر الاتصال بوظيفة إنشاء الحساب');
+      }
       if(data?.error) throw new Error(data.error);
+      if(!data?.ok) throw new Error('الوظيفة لم تؤكد نجاح إنشاء الحساب. راجع سجلات Edge Function في Supabase.');
       setNewTraderName(''); setNewTraderEmail(''); setNewTraderPassword('');
       setNotice('تم إنشاء حساب التاجر.'); await loadOwnerData();
-    } catch(err) { setNotice(`تعذر إنشاء الحساب: ${err?.message || 'خطأ غير معروف'}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`); }
+    } catch(err) { setNotice(`تعذر إنشاء الحساب: ${err?.message || 'خطأ غير معروف'}`); }
     finally { setCreatingTrader(false); }
   }
 
