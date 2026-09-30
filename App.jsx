@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   BadgeCheck, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Crown,
   LogIn, LogOut, MessageCircle, Send, ShieldCheck, ShoppingBag, Store,
-  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2, Type, Crop, Eraser, PenLine, UserPlus
+  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2, Type, Crop, Eraser, PenLine, UserPlus, Globe
 } from 'lucide-react';
 import { supabase } from './supabase.js';
 
@@ -82,6 +82,33 @@ const PREMIUM_CSS = `
 .app-shell .composer-tools{direction:rtl!important;background:#100d17!important;border-top:1px solid #ffffff12!important}
 .app-shell .send-form{direction:rtl!important}
 @media(max-width:520px){.app-shell .owner-dashboard{padding:15px!important}.app-shell .owner-create-form{padding:12px!important}.app-shell .chat-card{height:calc(100dvh - 184px);min-height:390px;display:flex;flex-direction:column}.app-shell .messages-list{flex:1 1 auto;height:auto!important;min-height:0!important;max-height:none!important}.app-shell .composer-tools,.app-shell .send-form{flex-shrink:0}.app-shell .bottom-dock{z-index:1000}}
+/* Final restoration: violet chat, compact media, branded header, editor-ready banner. */
+.app-shell .app-header{justify-content:space-between!important;direction:rtl!important;gap:10px!important;padding:8px 14px!important}
+.app-shell .app-header>.brand-lockup{display:flex!important;flex-shrink:0!important;gap:7px!important}
+.app-shell .app-header .brand-e{width:34px!important;height:34px!important;border-radius:11px!important}
+.app-shell .app-header .brand-e svg{width:21px!important;height:21px!important}
+.app-shell .app-header .brand-word strong{font-size:14px!important;white-space:nowrap!important}
+.app-shell .app-header .brand-word span{font-size:8px!important;letter-spacing:1px!important;white-space:nowrap!important}
+.app-shell .header-user{display:flex!important;align-items:center!important;gap:8px!important;margin:0!important}
+.app-shell .language-placeholder{display:flex!important;align-items:center!important;gap:6px!important;min-height:38px!important;padding:0 10px!important;border-radius:12px!important;background:#211a32!important;border:1px solid #8b6cff45!important;color:#d7caff!important;font-size:12px!important}
+.app-shell .glass-icon{display:grid!important;place-items:center!important;width:40px!important;height:40px!important;border-radius:13px!important;background:#171525!important;color:#d7caff!important;border:1px solid #ffffff18!important}
+.app-shell .messages-list{overflow-anchor:none!important;scrollbar-gutter:stable!important}
+.app-shell .message{width:fit-content!important;max-width:86%!important;flex:0 0 auto!important}
+.app-shell .message .message-content{width:fit-content!important;max-width:100%!important;background:linear-gradient(145deg,#211a33,#191525)!important;border:1px solid #8065cf42!important;border-radius:17px!important;box-shadow:0 5px 16px #0002!important}
+.app-shell .message.mine .message-content{background:linear-gradient(135deg,#6441c5,#473080)!important;border-color:#b7a1ff55!important;border-radius:17px!important}
+.app-shell .message-photo-link{display:inline-block!important;width:fit-content!important;max-width:190px!important;line-height:0!important;overflow:hidden!important;border-radius:12px!important}
+.app-shell .message-photo{display:block!important;width:auto!important;height:auto!important;max-width:190px!important;max-height:190px!important;object-fit:contain!important;border-radius:12px!important;background:#100d17!important}
+.app-shell .composer-tools{background:#110d1d!important}
+.app-shell button.composer-tool,.app-shell label.composer-tool{color:#c9b8ff!important;background:linear-gradient(145deg,#28203d,#1b152b)!important;border:1px solid #8e72df55!important}
+.app-shell .composer-tool svg{color:#c9b8ff!important;stroke:#c9b8ff!important}
+.app-shell .owner-create-form{background:linear-gradient(145deg,#211832,#15111f)!important;border:1px solid #8c6bdb55!important;box-shadow:0 12px 35px #0003!important}
+.app-shell .owner-create-form h3,.app-shell .owner-dashboard h3{color:#f5efff!important}
+.app-shell .owner-create-form input,.app-shell .owner-create-form input[type=email],.app-shell .owner-create-form input[type=password]{appearance:none!important;-webkit-appearance:none!important;background:#100d19!important;color:#fff!important;border:1px solid #69538f!important;border-radius:12px!important;min-height:46px!important;color-scheme:dark!important}
+.app-shell .owner-create-form .btn-primary{background:linear-gradient(120deg,#7652e8,#5733ba)!important;border:1px solid #a58cff55!important;color:#fff!important}
+.image-editor{color:#f8f4ff!important;background:linear-gradient(145deg,#211832,#100d18)!important;border-color:#8c6bdb66!important}
+.image-editor-preview{width:100%!important;max-height:48dvh!important;min-height:160px!important}
+.image-editor-preview img{max-width:100%!important;max-height:48dvh!important;object-fit:contain!important}
+@media(max-width:520px){.app-shell .app-header{height:60px!important}.app-shell .app-header .brand-word strong{font-size:12px!important}.app-shell .app-header .brand-word span{font-size:7px!important}.app-shell .language-placeholder{padding:0 7px!important}.app-shell .message{max-width:90%!important}.app-shell .message-photo{max-width:160px!important;max-height:160px!important}.app-shell .message-photo-link{max-width:160px!important}}
 
 `;
 const ROOMS = [
@@ -140,6 +167,7 @@ export default function App() {
   const [newTraderPassword, setNewTraderPassword] = useState('');
   const [creatingTrader, setCreatingTrader] = useState(false);
   const [imageDraft, setImageDraft] = useState(null);
+  const [imageTarget, setImageTarget] = useState('chat');
   const [imageBlur, setImageBlur] = useState(false);
   const [imageText, setImageText] = useState('');
   const [imageRatio, setImageRatio] = useState('original');
@@ -347,25 +375,15 @@ export default function App() {
 
   function addEmoji(emoji) { setMessageText(value => `${value}${emoji}`); }
 
-  async function uploadBanner(e) {
+  function uploadBanner(e) {
     const file = e.target.files?.[0]; e.target.value = '';
-    if (!file || !supabase || !session) return;
+    if (!file) return;
     if (!file.type.startsWith('image/')) return setNotice('اختار صورة بانر فقط.');
-    if (file.size > 6 * 1024 * 1024) return setNotice('حجم البانر لازم يكون أقل من 6 ميجابايت.');
-    setBannerBusy(true);
-    try {
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const path = `${session.user.id}/banner-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
-      if (error) throw error;
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-      const { error: metaError } = await supabase.auth.updateUser({ data: { ...(session.user.user_metadata || {}), banner_url: data.publicUrl } });
-      if (metaError) throw metaError;
-      setProfile(prev => ({ ...prev, banner_url: data.publicUrl }));
-      setNotice('تم تحديث البانر وحفظه في الحساب.');
-    } catch (err) {
-      setNotice(`تعذر رفع البانر: ${err?.message || 'خطأ غير معروف'}. تأكد من وجود Storage bucket باسم avatars وسياسات الرفع.`);
-    } finally { setBannerBusy(false); }
+    if (file.size > 8 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 8 ميجابايت.');
+    const url = URL.createObjectURL(file);
+    setImageTarget('banner');
+    setImageDraft({ file, url });
+    setImageBlur(false); setImageText(''); setImageRatio('landscape'); setImageDrawMode('pen');
   }
 
   async function persistSocialLinks(nextLinks) {
@@ -424,12 +442,12 @@ export default function App() {
     if (!file.type.startsWith('image/')) return setNotice('اختار صورة فقط.');
     if (file.size > 8 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 8 ميجابايت.');
     const url = URL.createObjectURL(file);
-    setImageDraft({ file, url }); setImageBlur(false); setImageText(''); setImageRatio('original'); setImageDrawMode('pen');
+    setImageTarget('chat'); setImageDraft({ file, url }); setImageBlur(false); setImageText(''); setImageRatio('original'); setImageDrawMode('pen');
   }
 
   function closeImageEditor() {
     if (imageDraft?.url) URL.revokeObjectURL(imageDraft.url);
-    setImageDraft(null); setImageBlur(false); setImageText('');
+    setImageDraft(null); setImageBlur(false); setImageText(''); setImageTarget('chat');
   }
 
   function beginImageDraw(e) {
@@ -454,24 +472,34 @@ export default function App() {
   async function sendEditedImage() {
     if (!imageDraft || !supabase || !session) return;
     setMediaBusy(true);
+    if (imageTarget === 'banner') setBannerBusy(true);
     try {
       const img = new Image(); img.src = imageDraft.url;
       await new Promise((resolve,reject) => { if (img.complete && img.naturalWidth) resolve(); else { img.onload=resolve; img.onerror=reject; } });
       let sx=0, sy=0, sw=img.naturalWidth, sh=img.naturalHeight;
       if (imageRatio === 'square') { sw=sh=Math.min(img.naturalWidth,img.naturalHeight); sx=(img.naturalWidth-sw)/2; sy=(img.naturalHeight-sh)/2; }
       if (imageRatio === 'landscape') { const ratio=16/9; if (sw/sh>ratio) { const nw=sh*ratio; sx=(sw-nw)/2; sw=nw; } else { const nh=sw/ratio; sy=(sh-nh)/2; sh=nh; } }
-      const out=document.createElement('canvas'); out.width=Math.round(sw); out.height=Math.round(sh); const ctx=out.getContext('2d');
+      const out=document.createElement('canvas'); out.width=Math.max(1,Math.round(sw)); out.height=Math.max(1,Math.round(sh)); const ctx=out.getContext('2d');
       ctx.filter=imageBlur?'blur(4px)':'none'; ctx.drawImage(img,sx,sy,sw,sh,0,0,out.width,out.height); ctx.filter='none';
       const overlay=imageCanvasRef.current; if (overlay) ctx.drawImage(overlay,sx,sy,sw,sh,0,0,out.width,out.height);
       if (imageText.trim()) { ctx.font=`bold ${Math.max(22,Math.round(out.width/18))}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.lineWidth=Math.max(3,out.width/220); ctx.strokeStyle='#000'; ctx.fillStyle='#fff'; const tx=imageText.trim().slice(0,120); ctx.strokeText(tx,out.width/2,out.height-22); ctx.fillText(tx,out.width/2,out.height-22); }
       const blob=await new Promise(resolve=>out.toBlob(resolve,'image/jpeg',0.9)); if (!blob) throw new Error('تعذر تجهيز الصورة بعد التعديل');
-      const path=`${session.user.id}/chat-${Date.now()}.jpg`;
+      const kind = imageTarget === 'banner' ? 'banner' : 'chat';
+      const path=`${session.user.id}/${kind}-${Date.now()}.jpg`;
       const {error:uploadError}=await supabase.storage.from('avatars').upload(path,blob,{upsert:false,contentType:'image/jpeg'}); if(uploadError) throw uploadError;
       const {data}=supabase.storage.from('avatars').getPublicUrl(path);
-      const sent=await insertChatBody(`__UPTRASID_IMAGE__:${data.publicUrl}`);
-      if(sent){setNotice('تم إرسال الصورة بعد التعديل.');closeImageEditor();}
-    } catch(err) { setNotice(`تعذر إرسال الصورة: ${err?.message || 'خطأ غير معروف'}.`); }
-    finally { setMediaBusy(false); }
+      if (imageTarget === 'banner') {
+        const { error: metaError } = await supabase.auth.updateUser({ data: { ...(session.user.user_metadata || {}), banner_url: data.publicUrl } });
+        if (metaError) throw metaError;
+        setProfile(prev => ({ ...prev, banner_url: data.publicUrl }));
+        setNotice('تم تعديل البانر وحفظه بنجاح.');
+        closeImageEditor();
+      } else {
+        const sent=await insertChatBody(`__UPTRASID_IMAGE__:${data.publicUrl}`);
+        if(sent){setNotice('تم إرسال الصورة بعد التعديل.');closeImageEditor();}
+      }
+    } catch(err) { setNotice(`تعذر ${imageTarget === 'banner' ? 'حفظ البانر' : 'إرسال الصورة'}: ${err?.message || 'خطأ غير معروف'}.`); }
+    finally { setMediaBusy(false); setBannerBusy(false); }
   }
 
   async function uploadAvatar(e) {
@@ -621,11 +649,10 @@ export default function App() {
 
   return <div className="app-shell" dir="rtl">
     <header className="app-header glass">
+      <Brand compact />
       <div className="header-user">
-        <button className="avatar-button" onClick={() => setTab('profile')} title="الملف الشخصي">
-          {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : <UserRound size={19}/>}
-        </button>
-        <button className="glass-icon" onClick={logout} title="تسجيل الخروج"><LogOut size={17}/></button>
+        <button className="language-placeholder" type="button" title="تغيير اللغة قريبًا"><Globe size={17}/><span>العربية</span></button>
+        <button className="glass-icon" onClick={logout} title="تسجيل الخروج" aria-label="تسجيل الخروج"><LogOut size={17}/></button>
       </div>
     </header>
 
@@ -638,7 +665,7 @@ export default function App() {
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.map(m => <article className={`message ${m.sender_id === session.user.id ? 'mine' : ''}`} key={m.id}>
             <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
+            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a className="message-photo-link" href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
           </article>)}
           <div ref={bottomRef} />
         </div>
@@ -684,7 +711,7 @@ export default function App() {
 
       {imageDraft && <div className="image-editor-backdrop" role="dialog" aria-modal="true" aria-label="تعديل الصورة قبل الإرسال">
         <section className="image-editor">
-          <div className="image-editor-top"><strong>تعديل الصورة قبل الإرسال</strong><button className="btn-secondary" type="button" onClick={closeImageEditor}><X size={17}/> إلغاء</button></div>
+          <div className="image-editor-top"><strong>{imageTarget === 'banner' ? 'تعديل البانر قبل الحفظ' : 'تعديل الصورة قبل الإرسال'}</strong><button className="btn-secondary" type="button" onClick={closeImageEditor}><X size={17}/> إلغاء</button></div>
           <div className="image-editor-preview">
             <img src={imageDraft.url} alt="معاينة الصورة" onLoad={e=>{const c=imageCanvasRef.current;if(c){c.width=e.currentTarget.naturalWidth;c.height=e.currentTarget.naturalHeight;}}} style={{filter:imageBlur?'blur(4px)':'none'}}/>
             <canvas ref={imageCanvasRef} onPointerDown={beginImageDraw} onPointerMove={moveImageDraw} onPointerUp={()=>{imageDrawingRef.current=false;}} onPointerCancel={()=>{imageDrawingRef.current=false;}} />
@@ -697,7 +724,7 @@ export default function App() {
             <button type="button" className={imageDrawMode==='blur'?'selected':''} onClick={()=>setImageDrawMode('blur')}><Eraser size={15}/> تشويش بالقلم</button>
             <input value={imageText} onChange={e=>setImageText(e.target.value)} placeholder="اكتب نص يظهر على الصورة" maxLength={120}/>
           </div>
-          <div className="image-editor-actions"><button type="button" className="btn-secondary" onClick={()=>{const c=imageCanvasRef.current;if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);setImageText('');setImageBlur(false);}}>مسح التعديلات</button><button type="button" className="btn-primary" onClick={sendEditedImage} disabled={mediaBusy}>{mediaBusy ? <LoaderCircle className="spin" size={17}/> : <Send size={17}/>} إرسال الصورة</button></div>
+          <div className="image-editor-actions"><button type="button" className="btn-secondary" onClick={()=>{const c=imageCanvasRef.current;if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);setImageText('');setImageBlur(false);}}>مسح التعديلات</button><button type="button" className="btn-primary" onClick={sendEditedImage} disabled={mediaBusy}>{mediaBusy ? <LoaderCircle className="spin" size={17}/> : imageTarget === 'banner' ? <Check size={17}/> : <Send size={17}/>} {imageTarget === 'banner' ? 'حفظ البانر' : 'إرسال الصورة'}</button></div>
         </section>
       </div>}
 
