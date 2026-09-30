@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { supabase } from './lib/supabase';
+import { supabase } from './supabase.js';
 import {
   BadgeCheck, Bell, BriefcaseBusiness, Check, CircleHelp, Crown, Globe2,
   Home, LogIn, LogOut, MessageCircle, Moon, Plus, Send, Settings, ShieldAlert,
