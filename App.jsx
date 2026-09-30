@@ -7,16 +7,31 @@ import {
 import { supabase } from './supabase.js';
 
 const WHATSAPP_NUMBER = '201091902522'; // رقم واتساب المالك بصيغة دولية بدون + أو مسافات
+/* Up Trasid / App Trusted visual refresh: CSS is embedded so only App.jsx needs replacing. */
+const PREMIUM_CSS = `
+:root{--premium-bg:#090910;--premium-panel:#15151f;--premium-line:rgba(255,255,255,.09);--premium-violet:#7957f5;--premium-red:#fa3157;--premium-text:#f6f5fb;--premium-muted:#a3a1b4}
+.app-shell{background:radial-gradient(ellipse at 50% -15%,#28183d 0%,#101019 42%,#08080d 100%)!important;color:var(--premium-text)!important;padding-bottom:108px!important;min-height:100dvh}
+.app-shell .app-header{background:rgba(17,17,27,.88)!important;border-bottom:1px solid var(--premium-line)!important;backdrop-filter:blur(18px);height:72px!important}
+.brand-lockup{gap:10px!important}.brand-e{background:linear-gradient(145deg,#ff4569,#7957f5)!important;border:1px solid #ffffff35!important;box-shadow:0 5px 24px #7957f544!important;border-radius:15px!important}.brand-word strong{font-size:20px!important;letter-spacing:.2px!important}.brand-word span{font-size:9px!important;letter-spacing:2px!important;color:#b9aaff!important}
+.splash{background:radial-gradient(ellipse at 50% 35%,#322047 0%,#0b0b12 58%,#050507 100%)!important}.splash-e{background:linear-gradient(145deg,#ff4569,#7957f5)!important;border-radius:25px!important;box-shadow:0 0 55px #7957f566!important}.splash-name{font-size:26px!important}.splash-store{letter-spacing:3px!important;color:#b9aaff!important}
+.app-shell .welcome-strip{background:linear-gradient(135deg,rgba(121,87,245,.16),rgba(250,49,87,.07),rgba(255,255,255,.025))!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 18px 50px #0003!important}
+.app-shell .welcome-strip h1{color:#fff!important}.app-shell .welcome-strip p{color:#b5b2c7!important}.app-shell .welcome-seal{background:linear-gradient(145deg,#261d3e,#17131f)!important;border-color:#8068d8!important;color:#c7baff!important;box-shadow:0 0 30px #7957f52a!important}
+.app-shell .room-tabs{display:flex!important;gap:9px!important;margin:16px 0!important}.app-shell .room-tabs button{flex:1;display:flex!important;align-items:center;justify-content:center;gap:8px!important;min-height:48px;padding:12px!important;background:#171720!important;border:1px solid var(--premium-line)!important;border-radius:15px!important;color:#c5c2d3!important;text-align:center!important}.app-shell .room-tabs button span{font-size:12px!important;color:inherit!important}.app-shell .room-tabs button small{display:none!important}.app-shell .room-tabs button svg{color:#b6a5ff!important;grid-row:auto!important}.app-shell .room-tabs button.active{background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff!important;color:#fff!important;box-shadow:0 8px 28px #7957f53d!important}.app-shell .room-tabs button.active svg{color:#fff!important}
+.app-shell .chat-card{background:rgba(19,19,29,.96)!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 20px 55px #0004!important}.app-shell .chat-heading{background:linear-gradient(100deg,rgba(121,87,245,.13),transparent)!important;border-bottom:1px solid var(--premium-line)!important;padding:20px!important}.app-shell .chat-heading h2{color:#fff!important;font-size:17px!important}.app-shell .messages-list{background:radial-gradient(ellipse at 50% 0%,#1c172b55,transparent 65%)!important;padding:18px!important}.app-shell .message-avatar{border-radius:50%!important;background:linear-gradient(145deg,#7957f5,#302047)!important;border:1px solid #ffffff20!important;cursor:pointer}.app-shell .message-content{background:#20202d!important;border:1px solid #ffffff12!important;border-radius:18px 6px 18px 18px!important;padding:11px 13px!important}.app-shell .message.mine .message-content{background:linear-gradient(135deg,#5936b5,#3c2a70)!important;border-color:#a28aff3b!important;border-radius:6px 18px 18px 18px!important}.app-shell .message-meta strong{color:#f6f3ff!important;font-size:11px!important}.app-shell .message-content p{color:#f2efff!important;font-size:13px!important;line-height:1.9!important}.app-shell .send-form{background:#11111a!important;border-top:1px solid var(--premium-line)!important;padding:14px!important}.app-shell .send-form input{background:#20202c!important;border:1px solid #ffffff14!important;border-radius:17px!important;min-height:46px!important;color:#fff!important}.app-shell .send-button{background:linear-gradient(135deg,#ff4569,#7957f5)!important;border-radius:15px!important;min-height:45px!important;box-shadow:0 7px 20px #7957f544!important}
+.app-shell .profile-card{background:#12121b!important;border:1px solid var(--premium-line)!important;border-radius:27px!important;box-shadow:0 20px 60px #0005!important}.app-shell .profile-cover{height:190px!important;background:linear-gradient(120deg,#fa3157 0%,#a52d7d 43%,#6f4cf0 100%)!important;overflow:visible!important}.app-shell .profile-cover:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 15%,#ffffff45,transparent 35%),linear-gradient(0deg,#09091030,transparent);pointer-events:none}.app-shell .profile-avatar{right:24px!important;bottom:-45px!important;width:104px!important;height:104px!important;border:5px solid #12121b!important;border-radius:30px!important;background:#272137!important;box-shadow:0 12px 30px #0006!important;color:#cbbfff!important}.app-shell .camera-button{right:101px!important;bottom:-36px!important;width:35px!important;height:35px!important;border:3px solid #12121b!important;border-radius:12px!important;background:linear-gradient(135deg,#ff4569,#7957f5)!important}.app-shell .profile-body{padding:61px 24px 25px!important}.app-shell .profile-body .eyebrow{color:#b7a5ff!important;letter-spacing:2px!important}.app-shell .profile-body h2{font-size:24px!important;display:flex;align-items:center;flex-wrap:wrap;gap:8px!important;color:#fff!important}.app-shell .profile-body h2 .verified-icon,.app-shell .verified-icon{color:#35a7ff!important;filter:drop-shadow(0 0 5px #35a7ff35)}.app-shell .profile-body .muted{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid #7957f555;border-radius:20px;background:#7957f518;color:#c9bcff!important;font-size:11px!important}.app-shell .profile-form{margin-top:20px!important;gap:14px!important}.app-shell .profile-form label{color:#e8e5f4!important}.app-shell .profile-form input,.app-shell .profile-form textarea{background:#1b1b27!important;border:1px solid #ffffff16!important;border-radius:14px!important;color:#fff!important;padding:13px!important}.app-shell .profile-form input:focus,.app-shell .profile-form textarea:focus{border-color:#8c73ff!important;outline:none!important;box-shadow:0 0 0 3px #7957f51f!important}.app-shell .btn-primary{background:linear-gradient(120deg,#fa3157,#7957f5)!important;border-radius:14px!important;box-shadow:0 8px 25px #7957f52b!important}.app-shell .btn-secondary{background:#20202c!important;border:1px solid #ffffff16!important;border-radius:13px!important;color:#e9e4ff!important}.app-shell .verify-request{display:flex;align-items:center;justify-content:center;gap:8px;width:100%!important}.app-shell .disclaimer{color:#a3a1b4!important;line-height:1.9!important}
+.app-shell .bottom-dock{width:min(calc(100% - 28px),430px)!important;height:72px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;border-radius:24px!important;background:rgba(21,20,32,.92)!important;border:1px solid #ffffff1a!important;box-shadow:0 15px 50px #0009,0 0 25px #7957f51a!important;backdrop-filter:blur(20px)}.app-shell .bottom-dock button{width:48%!important;height:56px!important;flex-direction:row!important;gap:9px!important;border-radius:17px!important;font-size:12px!important;color:#a6a2b8!important}.app-shell .bottom-dock button svg{width:21px!important;height:21px!important}.app-shell .bottom-dock button.active{color:#fff!important;background:linear-gradient(120deg,#7957f5,#5d3bc8)!important;border-color:#a18cff45!important;box-shadow:0 6px 24px #7957f53d!important}
+@media(max-width:520px){.app-shell .app-main{width:calc(100% - 22px)!important;margin:13px auto!important}.app-shell .welcome-strip{padding:16px!important;border-radius:21px!important}.app-shell .welcome-strip h1{font-size:19px!important}.app-shell .welcome-seal{width:64px!important;height:64px!important}.app-shell .profile-cover{height:165px!important}.app-shell .profile-body{padding:59px 17px 21px!important}.app-shell .profile-body h2{font-size:21px!important}.app-shell .messages-list{height:52vh!important;min-height:250px!important}.app-shell .bottom-dock{width:calc(100% - 24px)!important}}
+`;
 const ROOMS = [
-  { id: 'orders', label: 'شات الطلبات', icon: ShoppingBag, hint: 'طلبات التجار واحتياجاتهم' },
-  { id: 'sales', label: 'شات البيع', icon: Store, hint: 'العروض والمنتجات المتاحة' }
+  { id: 'orders', label: 'الطلبات', icon: ShoppingBag, hint: 'طلبات التجار واحتياجاتهم' },
+  { id: 'sales', label: 'البيع', icon: Store, hint: 'العروض والمنتجات المتاحة' }
 ];
 
 function Brand({ compact = false }) {
-  return <div className={`brand-lockup ${compact ? 'compact' : ''}`} aria-label="Erdogan Store">
-    <div className="brand-e">E</div>
-    <div className="brand-word"><strong>أردغان</strong><span>ERDOGAN STORE</span></div>
-  </div>;
+  return <><style>{PREMIUM_CSS}</style><div className={`brand-lockup ${compact ? 'compact' : ''}`} aria-label="App Trusted Erdogan">
+    <div className="brand-e">AT</div>
+    <div className="brand-word"><strong>App Trusted</strong><span>ERDOGAN 🇪🇬</span></div>
+  </div></>;
 }
 
 function Splash({ done }) {
@@ -27,9 +42,9 @@ function Splash({ done }) {
   return <div className="splash">
     <div className="splash-orbit orbit-one" /><div className="splash-orbit orbit-two" />
     <div className="splash-center">
-      <div className="splash-e">E</div>
-      <div className="splash-name">أردغان</div>
-      <div className="splash-store">ERDOGAN STORE</div>
+      <div className="splash-e">AT</div>
+      <div className="splash-name">App Trusted</div>
+      <div className="splash-store">ERDOGAN 🇪🇬</div>
       <div className="splash-line" />
     </div>
     <span className="splash-caption">PRIVATE TRADERS NETWORK</span>
@@ -56,12 +71,6 @@ export default function App() {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
-  const [newTraderName, setNewTraderName] = useState('');
-  const [newTraderEmail, setNewTraderEmail] = useState('');
-  const [newTraderPassword, setNewTraderPassword] = useState('');
-  const [creatingTrader, setCreatingTrader] = useState(false);
-  const [activityTrader, setActivityTrader] = useState(null);
-  const [traderActivity, setTraderActivity] = useState([]);
   const bottomRef = useRef(null);
   const configured = Boolean(supabase);
   const isOwner = profile?.role === 'owner' && profile?.status === 'active';
@@ -282,52 +291,6 @@ export default function App() {
     if (error) setNotice(`تعذر إيقاف الحساب: ${error.message}`);
     else { setNotice('تم إيقاف الحساب.'); loadOwnerData(); }
   }
-  async function createTraderAccount(e) {
-    e.preventDefault();
-    if (!supabase || !isOwner) return setNotice('إنشاء الحساب متاح للمالك فقط.');
-    const name = newTraderName.trim();
-    const traderEmail = newTraderEmail.trim().toLowerCase();
-    if (!name || !traderEmail || newTraderPassword.length < 8) {
-      return setNotice('اكتب اسم التاجر والبريد وكلمة مرور من 8 أحرف على الأقل.');
-    }
-    setCreatingTrader(true);
-    setNotice('جارٍ إنشاء حساب التاجر...');
-    try {
-      const { data, error } = await supabase.functions.invoke('owner-create-trader', {
-        body: { displayName: name, email: traderEmail, password: newTraderPassword }
-      });
-      if (error) throw new Error(error.message || 'تعذر الاتصال بوظيفة إنشاء الحساب');
-      if (data?.error) throw new Error(data.error);
-      setNewTraderName(''); setNewTraderEmail(''); setNewTraderPassword('');
-      setNotice('تم إنشاء حساب التاجر وتفعيله. سلّمه البريد وكلمة المرور بشكل خاص.');
-      await loadOwnerData();
-    } catch (err) {
-      // Edge Function errors often include the useful server message in the response body.
-      let detail = err?.message || 'خطأ غير معروف';
-      try {
-        if (err?.context && typeof err.context.json === 'function') {
-          const payload = await err.context.json();
-          if (payload?.error) detail = payload.error;
-        }
-      } catch { /* Keep the original error message if the response is not JSON. */ }
-      setNotice(`تعذر إنشاء الحساب: ${detail}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`);
-    } finally {
-      setCreatingTrader(false);
-    }
-  }
-
-  async function loadTraderActivity(trader) {
-    setActivityTrader(trader);
-    setTraderActivity([]);
-    const { data, error } = await supabase.from('group_messages')
-      .select('id, room, body, created_at')
-      .eq('sender_id', trader.id)
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (error) setNotice(`تعذر تحميل نشاط التاجر: ${error.message}`);
-    else setTraderActivity(data || []);
-  }
-
   async function reviewVerification(req, approve) {
     const { error: reqError } = await supabase.from('verification_requests').update({
       status: approve ? 'approved' : 'rejected', reviewed_by: session.user.id, reviewed_at: new Date().toISOString()
@@ -351,7 +314,7 @@ export default function App() {
       <Brand />
       <div className="auth-kicker"><LockKeyhole size={14} /> مساحة خاصة للتجار المعتمدين</div>
       <h1>{authMode === 'login' ? 'أهلاً بعودتك' : 'طلب حساب تاجر'}</h1>
-      <p className="auth-description">{authMode === 'login' ? 'سجّل دخولك للوصول إلى مجتمع أردغان ستور.' : 'أنشئ طلبك؛ لن تتمكن من دخول الشات حتى يوافق المالك.'}</p>
+      <p className="auth-description">{authMode === 'login' ? 'سجّل دخولك للوصول إلى مجتمع App Trusted.' : 'أنشئ طلبك؛ لن تتمكن من دخول الشات حتى يوافق المالك.'}</p>
       <div className="role-tabs">
         <button className={mode === 'owner' ? 'selected' : ''} onClick={() => setMode('owner')} type="button"><Crown size={17}/> دخول المالك</button>
         <button className={mode === 'trader' ? 'selected' : ''} onClick={() => setMode('trader')} type="button"><Store size={17}/> دخول التاجر</button>
@@ -395,7 +358,7 @@ export default function App() {
         <button className="avatar-button" onClick={() => setTab('profile')} title="الملف الشخصي">
           {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : <UserRound size={19}/>}
         </button>
-        <span className="header-name">{profile?.display_name || 'تاجر'}{isOwner && <Crown size={13}/>}</span>
+        <span className="header-name">{profile?.display_name || 'تاجر'}{profile?.verified && <BadgeCheck size={14} className="verified-icon"/>}{isOwner && <Crown size={13}/>}</span>
         <button className="glass-icon" onClick={logout} title="تسجيل الخروج"><LogOut size={17}/></button>
       </div>
     </header>
@@ -403,7 +366,7 @@ export default function App() {
     <main className="app-main">
       <section className="welcome-strip glass">
         <div><span className="eyebrow"><span className="live-dot"/> ONLINE TRADERS NETWORK</span><h1>أهلاً، {profile?.display_name || 'تاجر'}</h1><p>مساحتك الخاصة للتواصل وتبادل الطلبات والعروض.</p></div>
-        <div className="welcome-seal"><Crown size={25}/><span>ERDOGAN</span><small>STORE</small></div>
+        <div className="welcome-seal"><ShieldCheck size={25}/><span>APP TRUSTED</span><small>ERDOGAN 🇪🇬</small></div>
       </section>
 
       {notice && <div className="notice-bar"><CircleHelp size={16}/><span>{notice}</span><button onClick={() => setNotice('')}><X size={15}/></button></div>}
@@ -430,7 +393,7 @@ export default function App() {
         <div className="profile-cover"><div className="profile-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="الصورة الشخصية"/> : <UserRound size={38}/>}</div>
           <label className="camera-button" title="تغيير الصورة">{avatarBusy ? <LoaderCircle className="spin"/> : <Camera size={17}/>}<input type="file" accept="image/*" onChange={uploadAvatar} hidden /></label>
         </div>
-        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'OWNER' : 'TRADER'} · {profile?.verified ? 'حساب موثّق' : 'غير موثّق'}</p>
+        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'تاجر'} · {profile?.verified ? 'حساب موثّق' : 'غير موثّق'}</p>
           <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
           {!isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={requestVerification}><BadgeCheck size={17}/> طلب توثيق الحساب</button>}
           <p className="disclaimer">التوثيق يوضح أن المالك راجع الحساب فقط، ولا يمثل ضمانًا بنسبة 100% لأي صفقة.</p>
@@ -439,29 +402,15 @@ export default function App() {
 
       {tab === 'owner' && isOwner && <section className="owner-dashboard glass">
         <div className="dashboard-heading"><div><span className="eyebrow">OWNER CONTROL CENTER</span><h2>إدارة التجار</h2></div><button className="btn-secondary" onClick={loadOwnerData}>تحديث</button></div>
-
-        <h3>إنشاء حساب تاجر جديد</h3>
-        <p className="muted">القسم ده ظاهر للمالك فقط. الحساب بيتنشأ نشطًا وغير موثّق، وتقدر توثّقه بعد المراجعة.</p>
-        <form className="profile-form" onSubmit={createTraderAccount}>
-          <label>اسم التاجر أو المتجر<input value={newTraderName} onChange={e => setNewTraderName(e.target.value)} maxLength={80} required placeholder="اسم التاجر" /></label>
-          <label>البريد الإلكتروني<input type="email" value={newTraderEmail} onChange={e => setNewTraderEmail(e.target.value)} required placeholder="trader@example.com" dir="ltr" /></label>
-          <label>كلمة مرور مؤقتة<input type="password" value={newTraderPassword} onChange={e => setNewTraderPassword(e.target.value)} minLength={8} required placeholder="8 أحرف على الأقل" dir="ltr" /></label>
-          <button className="btn-primary" type="submit" disabled={creatingTrader}>{creatingTrader ? <LoaderCircle className="spin" size={17}/> : <Users size={17}/>} إنشاء حساب التاجر</button>
-        </form>
-
-        <h3>كل التجار ({profiles.filter(p => p.role === 'trader').length})</h3>
-        <div className="owner-list">{profiles.filter(p => p.role === 'trader').map(p => <div className="owner-row" key={p.id}><div><strong>{p.display_name}</strong><small>{p.status} · {p.verified ? 'موثّق' : 'غير موثّق'}</small></div><div className="owner-actions"><button className="btn-secondary" onClick={() => loadTraderActivity(p)}>عرض نشاطه</button>{p.status === 'pending' ? <button className="mini-approve" onClick={() => approveTrader(p.id)}>قبول</button> : p.status === 'active' ? <button className="mini-reject" onClick={() => suspendTrader(p.id)}>إيقاف</button> : null}</div></div>)}</div>
-
-        {activityTrader && <div className="owner-activity"><h3>آخر رسائل {activityTrader.display_name}</h3><p className="muted">آخر 100 رسالة أرسلها في شات الطلبات وشات البيع.</p>{traderActivity.length === 0 ? <p>لا توجد رسائل ظاهرة لهذا التاجر، أو لم يتم تحميلها.</p> : <div className="owner-list">{traderActivity.map(m => <div className="owner-row" key={m.id}><div><strong>{m.room === 'sales' ? 'شات البيع' : 'شات الطلبات'}</strong><p>{m.body}</p><small>{new Date(m.created_at).toLocaleString('ar-EG')}</small></div></div>)}</div>}</div>}
-
+        <h3>طلبات الحسابات ({profiles.filter(p => p.role === 'trader' && p.status === 'pending').length})</h3>
+        <div className="owner-list">{profiles.filter(p => p.role === 'trader').map(p => <div className="owner-row" key={p.id}><div><strong>{p.display_name}</strong><small>{p.status} · {p.verified ? 'موثّق' : 'غير موثّق'}</small></div><div className="owner-actions">{p.status === 'pending' ? <button className="mini-approve" onClick={() => approveTrader(p.id)}>قبول</button> : p.status === 'active' ? <button className="mini-reject" onClick={() => suspendTrader(p.id)}>إيقاف</button> : null}</div></div>)}</div>
         <h3>طلبات التوثيق ({verificationRequests.length})</h3>
         <div className="owner-list">{verificationRequests.map(req => <div className="owner-row" key={req.id}><div><strong>{req.profiles?.display_name || 'تاجر'}</strong><small>طلب توثيق · {new Date(req.created_at).toLocaleDateString('ar-EG')}</small></div><div className="owner-actions"><button className="mini-approve" onClick={() => reviewVerification(req, true)}>توثيق</button><button className="mini-reject" onClick={() => reviewVerification(req, false)}>رفض</button></div></div>)}</div>
       </section>}
 
-      <nav className="bottom-dock glass">
-        <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}><ShoppingBag/><span>الطلبات</span></button>
-        <button className={tab === 'sales' ? 'active' : ''} onClick={() => setTab('sales')}><Store/><span>البيع</span></button>
-        <button className={tab === 'profile' ? 'active' : ''} onClick={() => setTab('profile')}><UserRound/><span>حسابي</span></button>
+      <nav className="bottom-dock glass" aria-label="التنقل الرئيسي">
+        <button className={['orders', 'sales'].includes(tab) ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
+        <button className={tab === 'profile' ? 'active' : ''} onClick={() => setTab('profile')}><UserRound/><span>Profile</span></button>
         {isOwner && <button className={tab === 'owner' ? 'active' : ''} onClick={() => {setTab('owner');loadOwnerData();}}><Crown/><span>المالك</span></button>}
       </nav>
     </main>
