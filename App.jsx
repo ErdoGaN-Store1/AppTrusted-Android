@@ -110,6 +110,39 @@ const PREMIUM_CSS = `
 .image-editor-preview img{max-width:100%!important;max-height:48dvh!important;object-fit:contain!important}
 @media(max-width:520px){.app-shell .app-header{height:60px!important}.app-shell .app-header .brand-word strong{font-size:12px!important}.app-shell .app-header .brand-word span{font-size:7px!important}.app-shell .language-placeholder{padding:0 7px!important}.app-shell .message{max-width:90%!important}.app-shell .message-photo{max-width:160px!important;max-height:160px!important}.app-shell .message-photo-link{max-width:160px!important}}
 
+/* Glassy message actions, reactions and violet microphone controls */
+.app-shell .chat-card,.app-shell .message-action-popover,.app-shell .reaction-picker,.app-shell .message-confirm{backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.app-shell .message{position:relative;touch-action:pan-y;}
+.app-shell .message-content{position:relative;overflow:visible;}
+.app-shell .message-reactions{display:flex;flex-wrap:wrap;gap:5px;margin:5px 2px 0;}
+.app-shell .reaction-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;border:1px solid #a78bfa55;background:rgba(31,24,48,.88);color:#fff;font-size:15px;box-shadow:inset 0 1px #ffffff14;}
+.app-shell .reaction-chip small{font-size:10px;color:#e9ddff;}
+.app-shell .reaction-chip.mine-reaction{background:linear-gradient(135deg,#6941c6aa,#9b5de555);border-color:#c4b5fd;}
+.app-shell .message-action-popover{position:absolute;z-index:50;top:calc(100% + 7px);left:0;min-width:220px;max-width:min(300px,85vw);padding:9px;border:1px solid #c4b5fd44;border-radius:18px;background:rgba(20,15,32,.94);box-shadow:0 16px 45px #0009;display:flex;flex-direction:column;gap:5px;direction:rtl;}
+.app-shell .message.mine .message-action-popover{left:auto;right:0;}
+.app-shell .quick-reactions{display:flex;align-items:center;justify-content:space-between;gap:3px;padding:3px 2px 8px;border-bottom:1px solid #ffffff17;}
+.app-shell .quick-reactions button{width:34px;height:34px;border:0;border-radius:11px;background:rgba(255,255,255,.06);font-size:21px;}
+.app-shell .quick-reactions .reaction-more{color:#e9ddff;font-size:22px;background:linear-gradient(135deg,#7957f5aa,#9b5de566);border:1px solid #c4b5fd55;}
+.app-shell .message-action-popover>button{display:flex;align-items:center;gap:9px;text-align:right;width:100%;border:0;border-radius:10px;padding:10px;background:rgba(255,255,255,.045);color:#f5f0ff;font-size:13px;}
+.app-shell .message-action-popover>button.danger-action{color:#ffb7c7;}
+.app-shell .message-action-popover>button.close-message-menu{justify-content:center;color:#bdb4d3;background:transparent;padding:6px;}
+.app-shell .reaction-picker{border:1px solid #ffffff1b;border-radius:12px;padding:7px;background:rgba(8,7,15,.65);}
+.app-shell .reaction-picker input{width:100%;box-sizing:border-box;background:#211a30;border:1px solid #ffffff20;border-radius:9px;padding:9px;color:white;outline:none;}
+.app-shell .reaction-picker>div{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;max-height:145px;overflow:auto;margin-top:7px;}
+.app-shell .reaction-picker>div button{background:transparent;border:0;border-radius:7px;font-size:22px;padding:5px 0;}
+.app-shell .chat-action-toast{display:flex;align-items:center;gap:8px;padding:9px 12px;margin:5px 12px;border:1px solid #a78bfa55;border-radius:12px;background:rgba(71,48,128,.8);color:#f8f5ff;font-size:12px;}
+.app-shell .chat-action-toast svg{color:#c4b5fd;}
+.app-shell .chat-action-toast button{margin-inline-start:auto;border:0;background:transparent;color:#fff;font-size:20px;}
+.app-shell .message-confirm-backdrop{position:fixed;inset:0;z-index:10020;display:grid;place-items:center;padding:18px;background:#05040bc9;backdrop-filter:blur(8px);}
+.app-shell .message-confirm{width:min(100%,360px);box-sizing:border-box;padding:20px;border:1px solid #a78bfa55;border-radius:22px;background:linear-gradient(145deg,rgba(35,26,54,.97),rgba(13,11,21,.98));box-shadow:0 20px 70px #000b;color:#fff;}
+.app-shell .message-confirm strong{font-size:16px;}
+.app-shell .message-confirm p{font-size:13px;line-height:1.8;color:#c9c2d9;}
+.app-shell .message-confirm>div{display:flex;gap:9px;margin-top:14px;}
+.app-shell .message-confirm>div button{flex:1;display:flex;justify-content:center;align-items:center;gap:7px;min-height:43px;}
+.app-shell .composer-tool{background:rgba(121,87,245,.16)!important;border:1px solid #a78bfa66!important;color:#d9ccff!important;box-shadow:inset 0 1px #ffffff15,0 5px 18px #0003!important;backdrop-filter:blur(16px);}
+.app-shell .composer-tool svg{color:#d9ccff!important;stroke:#d9ccff!important;}
+@media(max-width:520px){.app-shell .message-action-popover{max-width:82vw}.app-shell .message-confirm{border-radius:20px}}
+
 `;
 const ROOMS = [
   // Keep existing room key to preserve messages already stored in Supabase.
@@ -156,6 +189,14 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [reactionRows, setReactionRows] = useState([]);
+  const [messageMenu, setMessageMenu] = useState(null);
+  const [reactionPickerOpen, setReactionPickerOpen] = useState(false);
+  const [reactionSearch, setReactionSearch] = useState('');
+  const [pendingMessageAction, setPendingMessageAction] = useState(null);
+  const [actionToast, setActionToast] = useState('');
+  const [hiddenMessageIds, setHiddenMessageIds] = useState([]);
+  const longPressTimerRef = useRef(null);
   const [mediaBusy, setMediaBusy] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [verificationRequests, setVerificationRequests] = useState([]);
@@ -184,6 +225,9 @@ export default function App() {
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
   const bottomRef = useRef(null);
+  const messagesListRef = useRef(null);
+  const forceScrollToBottomRef = useRef(false);
+  const hasLoadedChatOnceRef = useRef(false);
   const configured = Boolean(supabase);
   const isOwner = profile?.role === 'owner' && profile?.status === 'active';
   const isActive = profile?.status === 'active';
@@ -224,6 +268,12 @@ export default function App() {
   useEffect(() => { activeRoomRef.current = tab; }, [tab]);
 
   useEffect(() => {
+    if (!session?.user?.id) { setHiddenMessageIds([]); return; }
+    try { setHiddenMessageIds(JSON.parse(localStorage.getItem(`trusted-hidden-messages-${session.user.id}`) || '[]')); }
+    catch { setHiddenMessageIds([]); }
+  }, [session?.user?.id]);
+
+  useEffect(() => {
     if (!supabase || !session || !isActive || tab !== 'orders') return;
     let disposed = false;
     const refresh = () => { if (!disposed) loadMessages(tab); };
@@ -240,7 +290,22 @@ export default function App() {
     };
   }, [session, isActive, tab]);
 
-  // لا نعمل scroll تلقائي مع كل تحديث؛ التحديث الدوري للشات كان بيقفز بالشاشة للمحادثة.
+  // انزل لآخر الشات عند فتحه أو وصول رسالة جديدة وإنت بالفعل قريب من الأسفل؛ لا تقاطع التصفح القديم.
+  useEffect(() => {
+    if (tab !== 'orders') return;
+    forceScrollToBottomRef.current = true;
+    const frame = requestAnimationFrame(() => { if (messagesListRef.current) messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight; });
+    return () => cancelAnimationFrame(frame);
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== 'orders' || !forceScrollToBottomRef.current) return;
+    forceScrollToBottomRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      if (messagesListRef.current) messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [messages, tab]);
 
   useEffect(() => {
     if (!supabase || !isOwner) return;
@@ -256,14 +321,19 @@ export default function App() {
       if (activeRoomRef.current === room) setNotice(`تعذر تحميل الشات: ${error.message}`);
     } else if (activeRoomRef.current === room) {
       const nextMessages = data || [];
-      // Keep the same array when polling returns the same messages so React does not
-      // unnecessarily rebuild the scroll area and disturb the user's scroll position.
+      // Keep the same array on unchanged polling; follow new messages only if the user is near the bottom.
       setMessages(previous => {
-        if (previous.length === nextMessages.length && previous.every((item, index) =>
+        const unchanged = previous.length === nextMessages.length && previous.every((item, index) =>
           item.id === nextMessages[index]?.id && item.body === nextMessages[index]?.body && item.created_at === nextMessages[index]?.created_at
-        )) return previous;
+        );
+        if (unchanged) return previous;
+        const list = messagesListRef.current;
+        const nearBottom = !list || (list.scrollHeight - list.scrollTop - list.clientHeight < 140);
+        if (!hasLoadedChatOnceRef.current || nearBottom) forceScrollToBottomRef.current = true;
+        hasLoadedChatOnceRef.current = true;
         return nextMessages;
       });
+      loadMessageReactions(nextMessages.map(item => String(item.id)));
     }
   }
 
@@ -360,6 +430,7 @@ export default function App() {
     if (!supabase || !session || !isActive || !body) return false;
     const { error } = await supabase.from('group_messages').insert({ room: 'orders', body, sender_id: session.user.id });
     if (error) { setNotice(`لم تُرسل الرسالة: ${error.message}`); return false; }
+    forceScrollToBottomRef.current = true;
     await loadMessages('orders');
     return true;
   }
@@ -374,6 +445,91 @@ export default function App() {
   }
 
   function addEmoji(emoji) { setMessageText(value => `${value}${emoji}`); }
+  async function loadMessageReactions(messageIds) {
+    if (!supabase || !session?.user?.id || !messageIds.length) { setReactionRows([]); return; }
+    const { data, error } = await supabase.from('group_message_reactions')
+      .select('message_id,user_id,emoji').in('message_id', messageIds);
+    if (error) {
+      if (!window.__trustedReactionSchemaWarned) {
+        window.__trustedReactionSchemaWarned = true;
+        setNotice('لتفعيل الرياكت والحذف الآمن، نفّذ كود SQL المرفق مرة واحدة في Supabase.');
+      }
+      return;
+    }
+    setReactionRows(data || []);
+  }
+
+  function openMessageMenu(id) {
+    setMessageMenu({ id });
+    setReactionPickerOpen(false);
+    setReactionSearch('');
+  }
+
+  function beginMessageLongPress(id) {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = setTimeout(() => openMessageMenu(id), 480);
+  }
+
+  function endMessageLongPress() {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  }
+
+  async function reactToMessage(message, emoji) {
+    if (!supabase || !session?.user?.id) return;
+    const messageId = String(message.id);
+    const current = reactionRows.find(row => row.message_id === messageId && row.user_id === session.user.id);
+    let result;
+    if (current?.emoji === emoji) {
+      result = await supabase.from('group_message_reactions').delete().eq('message_id', messageId).eq('user_id', session.user.id);
+    } else {
+      result = await supabase.from('group_message_reactions').upsert({ message_id: messageId, user_id: session.user.id, emoji }, { onConflict: 'message_id,user_id' });
+    }
+    if (result.error) { setNotice(`تعذر حفظ الرياكت: ${result.error.message}`); return; }
+    setMessageMenu(null); setReactionPickerOpen(false); setActionToast('تم تسجيل الرياكت ✓');
+    await loadMessageReactions(messages.map(item => String(item.id)));
+  }
+
+  function requestMessageAction(type, message) {
+    setPendingMessageAction({ type, message });
+    setMessageMenu(null);
+    setReactionPickerOpen(false);
+  }
+
+  async function confirmMessageAction() {
+    if (!pendingMessageAction || !session?.user?.id) return;
+    const { type, message } = pendingMessageAction;
+    if (type === 'hide') {
+      const next = [...new Set([...hiddenMessageIds, String(message.id)])];
+      setHiddenMessageIds(next);
+      try { localStorage.setItem(`trusted-hidden-messages-${session.user.id}`, JSON.stringify(next)); } catch {}
+      setActionToast('تم حذف الرسالة من عندك ✓');
+      setPendingMessageAction(null);
+      return;
+    }
+    if (type === 'delete') {
+      if (message.sender_id !== session.user.id && !isOwner) {
+        setNotice('حذف رسائل الآخرين متاح للمالك فقط.'); setPendingMessageAction(null); return;
+      }
+      let query = supabase.from('group_messages').delete().eq('id', message.id);
+      if (!isOwner) query = query.eq('sender_id', session.user.id);
+      const { data, error } = await query.select('id');
+      if (error || !data?.length) {
+        setNotice(`تعذر حذف الرسالة: ${error?.message || 'تحقق من سياسة الحذف في Supabase.'}`);
+        setPendingMessageAction(null); return;
+      }
+      setMessages(previous => previous.filter(item => String(item.id) !== String(message.id)));
+      setReactionRows(previous => previous.filter(item => item.message_id !== String(message.id)));
+      setActionToast('تم حذف الرسالة للجميع ✓');
+      setPendingMessageAction(null);
+    }
+  }
+
+  const QUICK_REACTIONS = ['❤️', '🫂', '😂', '😭', '👍'];
+  const SEARCHABLE_REACTIONS = [
+    ['❤️','قلب'],['🫂','حضن صاحب'],['😂','ضحك'],['😭','عياط'],['👍','إيد إعجاب'],['🥰','حب'],['😍','إعجاب'],['🤣','ضحك قوي'],['😢','حزين'],['😮','مندهش'],['😡','غضب'],['🙏','دعاء'],['👏','تصفيق'],['🔥','نار'],['💯','مية'],['🤝','اتفاق'],['🥹','متأثر'],['😎','كول'],['🎉','احتفال'],['✨','لمعة'],['💜','قلب بنفسجي'],['🫶','قلب بالإيد'],['🤔','تفكير'],['🙌','إيدين مرفوعين'],['👀','عيون'],['💪','قوة'],['💔','قلب مكسور'],['😴','نوم'],['🤗','حضن'],['😇','ملاك']
+  ];
+  const visibleReactionChoices = SEARCHABLE_REACTIONS.filter(([emoji, label]) => `${emoji} ${label}`.toLowerCase().includes(reactionSearch.trim().toLowerCase()));
 
   function uploadBanner(e) {
     const file = e.target.files?.[0]; e.target.value = '';
@@ -661,14 +817,36 @@ export default function App() {
 
       {tab === 'orders' && <section className="chat-card glass">
         <div className="chat-heading"><div><h2>شات تجار ترستد</h2><p>المحادثة الجماعية</p></div>{isOwner && <span className="owner-chat-tag"><Crown size={14}/> المالك</span>}</div>
-        <div className="messages-list">
+        <div className="messages-list" ref={messagesListRef}>
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
-          {messages.map(m => <article className={`message ${m.sender_id === session.user.id ? 'mine' : ''}`} key={m.id}>
-            <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a className="message-photo-link" href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
-          </article>)}
+          {messages.filter(m => !hiddenMessageIds.includes(String(m.id))).map(m => {
+            const mine = m.sender_id === session.user.id;
+            const reactions = reactionRows.filter(row => row.message_id === String(m.id)).reduce((acc, row) => {
+              if (!acc[row.emoji]) acc[row.emoji] = { count: 0, mine: false };
+              acc[row.emoji].count += 1;
+              if (row.user_id === session.user.id) acc[row.emoji].mine = true;
+              return acc;
+            }, {});
+            const canDeleteEveryone = mine || isOwner;
+            return <article className={`message ${mine ? 'mine' : ''} ${messageMenu?.id === m.id ? 'message-menu-active' : ''}`} key={m.id}
+              onTouchStart={() => beginMessageLongPress(m.id)} onTouchEnd={endMessageLongPress} onTouchMove={endMessageLongPress}
+              onContextMenu={event => { event.preventDefault(); openMessageMenu(m.id); }}>
+              <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
+              <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a className="message-photo-link" href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
+              {Object.keys(reactions).length > 0 && <div className="message-reactions">{Object.entries(reactions).map(([emoji, data]) => <button key={emoji} type="button" className={`reaction-chip ${data.mine ? 'mine-reaction' : ''}`} onClick={() => reactToMessage(m, emoji)}>{emoji}<small>{data.count}</small></button>)}</div>}
+              {messageMenu?.id === m.id && <div className="message-action-popover" onTouchStart={event => event.stopPropagation()} onContextMenu={event => event.stopPropagation()}>
+                <div className="quick-reactions">{QUICK_REACTIONS.map(emoji => <button type="button" key={emoji} onClick={() => reactToMessage(m, emoji)} aria-label={`رياكت ${emoji}`}>{emoji}</button>)}<button type="button" className="reaction-more" onClick={() => setReactionPickerOpen(value => !value)} aria-label="المزيد من الإيموجي">＋</button></div>
+                {reactionPickerOpen && <div className="reaction-picker"><input aria-label="ابحث عن إيموجي" placeholder="ابحث عن إيموجي..." value={reactionSearch} onChange={event => setReactionSearch(event.target.value)} /><div>{visibleReactionChoices.map(([emoji, label]) => <button type="button" key={`${emoji}-${label}`} title={label} onClick={() => reactToMessage(m, emoji)}>{emoji}</button>)}</div></div>}
+                <button type="button" onClick={() => requestMessageAction('hide', m)}><span aria-hidden="true">◉</span> حذف لدي</button>
+                {canDeleteEveryone && <button type="button" className="danger-action" onClick={() => requestMessageAction('delete', m)}><Trash2 size={15}/> حذف لدى الجميع</button>}
+                <button type="button" className="close-message-menu" onClick={() => { setMessageMenu(null); setReactionPickerOpen(false); }}>إغلاق</button>
+              </div>}
+            </article>;
+          })}
           <div ref={bottomRef} />
         </div>
+        {actionToast && <div className="chat-action-toast"><CheckCircle2 size={16}/>{actionToast}<button type="button" onClick={() => setActionToast('')} aria-label="إغلاق">×</button></div>}
+        {pendingMessageAction && <div className="message-confirm-backdrop" role="presentation"><section className="message-confirm glass" role="dialog" aria-modal="true"><strong>{pendingMessageAction.type === 'delete' ? 'تأكيد حذف الرسالة لدى الجميع؟' : 'تأكيد حذف الرسالة من عندك؟'}</strong><p>{pendingMessageAction.type === 'delete' ? 'الرسالة هتتمسح من الشات عند كل المستخدمين، ومش هتقدر ترجعها.' : 'الرسالة هتختفي من جهازك فقط، وباقي الناس هتفضل شايفاها.'}</p><div><button type="button" className="btn-secondary" onClick={() => setPendingMessageAction(null)}>إلغاء</button><button type="button" className="btn-primary" onClick={confirmMessageAction}><Check size={17}/> تأكيد</button></div></section></div>}
         {emojiOpen && <div className="emoji-panel" aria-label="لوحة الإيموجي">{CHAT_EMOJIS.map((emoji, index) => <button type="button" key={`${emoji}-${index}`} onClick={() => addEmoji(emoji)} aria-label={`إضافة ${emoji}`}>{emoji}</button>)}</div>}
         <div className="composer-tools">
           <button className="composer-tool" type="button" onClick={() => setEmojiOpen(value => !value)} title="الإيموجي" aria-label="فتح لوحة الإيموجي"><Smile size={19}/></button>
