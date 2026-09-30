@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   BadgeCheck, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Crown,
   LogIn, LogOut, MessageCircle, Send, ShieldCheck, ShoppingBag, Store,
-  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2
+  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2, Type, Crop, Eraser, PenLine, UserPlus
 } from 'lucide-react';
 import { supabase } from './supabase.js';
 
@@ -11,7 +11,7 @@ const WHATSAPP_NUMBER = '201091902522'; // رقم واتساب المالك بص
 const PREMIUM_CSS = `
 :root{--premium-bg:#090910;--premium-panel:#15151f;--premium-line:rgba(255,255,255,.09);--premium-violet:#7957f5;--premium-red:#fa3157;--premium-text:#f6f5fb;--premium-muted:#a3a1b4}
 .app-shell{background:radial-gradient(ellipse at 50% -15%,#28183d 0%,#101019 42%,#08080d 100%)!important;color:var(--premium-text)!important;padding-bottom:108px!important;min-height:100dvh}
-.app-shell .app-header{background:rgba(17,17,27,.88)!important;border-bottom:1px solid var(--premium-line)!important;backdrop-filter:blur(18px);height:72px!important}
+.app-shell .app-header{background:rgba(17,17,27,.88)!important;border-bottom:1px solid var(--premium-line)!important;backdrop-filter:blur(18px);height:62px!important;justify-content:flex-end!important;padding-inline:16px!important}.app-shell .app-header>.brand-lockup,.app-shell .header-name{display:none!important}.app-shell .header-user{margin-inline-start:auto!important}
 .brand-lockup{gap:10px!important}.brand-e{background:linear-gradient(145deg,#ff4569,#7957f5)!important;border:1px solid #ffffff35!important;box-shadow:0 5px 24px #7957f544!important;border-radius:15px!important}.brand-word strong{font-size:20px!important;letter-spacing:.2px!important}.brand-word span{font-size:9px!important;letter-spacing:2px!important;color:#b9aaff!important}
 .splash{background:radial-gradient(ellipse at 50% 35%,#322047 0%,#0b0b12 58%,#050507 100%)!important}.splash-e{background:linear-gradient(145deg,#ff4569,#7957f5)!important;border-radius:25px!important;box-shadow:0 0 55px #7957f566!important}.splash-name{font-size:26px!important}.splash-store{letter-spacing:3px!important;color:#b9aaff!important}
 .app-shell .welcome-strip{background:linear-gradient(135deg,rgba(121,87,245,.16),rgba(250,49,87,.07),rgba(255,255,255,.025))!important;border:1px solid var(--premium-line)!important;border-radius:25px!important;box-shadow:0 18px 50px #0003!important}
@@ -26,7 +26,7 @@ const PREMIUM_CSS = `
 .app-shell .app-main{margin-top:12px!important}
 .app-shell .chat-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .app-shell .chat-heading p,.app-shell .chat-heading .live-dot,.app-shell .online-pill{display:none!important}
-.app-shell .messages-list{display:flex;flex-direction:column;direction:ltr;overflow-y:auto;overscroll-behavior:contain}
+.app-shell .messages-list{display:flex;flex-direction:column;direction:ltr;overflow-y:auto;overscroll-behavior:contain;overflow-anchor:auto;scroll-behavior:auto}
 .app-shell .message{display:flex;align-items:flex-end;direction:ltr;max-width:88%;align-self:flex-end;flex-direction:row-reverse}
 .app-shell .message .message-content{direction:rtl;text-align:right}
 .app-shell .message.mine{align-self:flex-start;flex-direction:row}
@@ -49,7 +49,7 @@ const PREMIUM_CSS = `
 .role-tabs button.selected{background:linear-gradient(135deg,#39234f,#241631)!important;border-color:#a56bce!important}
 .auth-panel .btn-primary{background:linear-gradient(110deg,#fb7185,#a855d8 62%,#7154e8)!important;border-radius:14px!important}
 .owner-chat-tag,.media-status{display:inline-flex;align-items:center;gap:5px;color:#c4b5fd;font-size:10px}
-@media(max-width:520px){.app-shell .message{max-width:94%}.app-shell .emoji-panel{grid-template-columns:repeat(7,minmax(0,1fr))}.app-shell .chat-card{min-height:calc(100dvh - 170px)}.app-shell .messages-list{height:calc(100dvh - 340px);min-height:240px}}
+.image-editor-backdrop{position:fixed;inset:0;z-index:9999;background:#05040beF;display:grid;place-items:center;padding:12px}.image-editor{width:min(100%,720px);max-height:94dvh;overflow:auto;background:#15131f;border:1px solid #ffffff20;border-radius:22px;padding:14px;color:#fff;box-shadow:0 25px 80px #000b}.image-editor-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.image-editor-preview{position:relative;display:grid;place-items:center;max-height:58dvh;min-height:180px;background:#08080d;border-radius:14px;overflow:hidden}.image-editor-preview img{display:block;max-width:100%;max-height:58dvh;object-fit:contain}.image-editor-preview canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}.image-editor-tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.image-editor-tools button,.image-editor-tools select,.image-editor-tools input{border:1px solid #ffffff20;background:#252132;color:#fff;border-radius:10px;padding:9px;font-size:12px}.image-editor-tools button.selected{background:#6844cc;border-color:#b5a2ff}.image-editor-actions{display:flex;gap:9px}.image-editor-actions button{flex:1;min-height:44px}.owner-create-form{display:grid;grid-template-columns:1fr;gap:10px;padding:15px;margin:14px 0 20px;background:#1b1825;border:1px solid #ffffff14;border-radius:17px}.owner-create-form input{width:100%;padding:12px;border-radius:11px;background:#100d17;color:#fff;border:1px solid #393044}.owner-create-form h3{margin:0}.app-shell .message-photo{background:#252132;min-height:35px}.app-shell .message-photo:after{content:''}@media(max-width:520px){.app-shell .message{max-width:94%}.app-shell .emoji-panel{grid-template-columns:repeat(7,minmax(0,1fr))}.app-shell .chat-card{min-height:calc(100dvh - 170px)}.app-shell .messages-list{height:calc(100dvh - 340px);min-height:240px}}
 .app-shell .profile-cover{position:relative!important}
 .app-shell .profile-avatar{right:50%!important;transform:translateX(50%)!important;bottom:-48px!important;border-radius:50%!important;width:112px!important;height:112px!important}
 .app-shell .camera-button{right:calc(50% - 68px)!important;bottom:-37px!important}
@@ -115,6 +115,17 @@ export default function App() {
   const [myVerification, setMyVerification] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [bannerBusy, setBannerBusy] = useState(false);
+  const [newTraderName, setNewTraderName] = useState('');
+  const [newTraderEmail, setNewTraderEmail] = useState('');
+  const [newTraderPassword, setNewTraderPassword] = useState('');
+  const [creatingTrader, setCreatingTrader] = useState(false);
+  const [imageDraft, setImageDraft] = useState(null);
+  const [imageBlur, setImageBlur] = useState(false);
+  const [imageText, setImageText] = useState('');
+  const [imageRatio, setImageRatio] = useState('original');
+  const [imageDrawMode, setImageDrawMode] = useState('pen');
+  const imageCanvasRef = useRef(null);
+  const imageDrawingRef = useRef(false);
   const [socialEditorOpen, setSocialEditorOpen] = useState(false);
   const [socialPlatform, setSocialPlatform] = useState('WhatsApp');
   const [socialValue, setSocialValue] = useState('');
@@ -181,7 +192,7 @@ export default function App() {
     };
   }, [session, isActive, tab]);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages]);
+  // لا نعمل scroll تلقائي مع كل تحديث؛ التحديث الدوري للشات كان بيقفز بالشاشة للمحادثة.
 
   useEffect(() => {
     if (!supabase || !isOwner) return;
@@ -379,25 +390,60 @@ export default function App() {
 
   function stopVoiceRecording() { if (recorderRef.current && recorderRef.current.state !== 'inactive') recorderRef.current.stop(); }
 
-  async function uploadChatImage(e) {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file || !supabase || !session) return;
+  function uploadChatImage(e) {
+    const file = e.target.files?.[0]; e.target.value = '';
+    if (!file) return;
     if (!file.type.startsWith('image/')) return setNotice('اختار صورة فقط.');
-    if (file.size > 5 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 5 ميجابايت.');
+    if (file.size > 8 * 1024 * 1024) return setNotice('حجم الصورة لازم يكون أقل من 8 ميجابايت.');
+    const url = URL.createObjectURL(file);
+    setImageDraft({ file, url }); setImageBlur(false); setImageText(''); setImageRatio('original'); setImageDrawMode('pen');
+  }
+
+  function closeImageEditor() {
+    if (imageDraft?.url) URL.revokeObjectURL(imageDraft.url);
+    setImageDraft(null); setImageBlur(false); setImageText('');
+  }
+
+  function beginImageDraw(e) {
+    const canvas = imageCanvasRef.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d'); const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * canvas.width / rect.width;
+    const y = (e.clientY - rect.top) * canvas.height / rect.height;
+    imageDrawingRef.current = true; canvas.setPointerCapture?.(e.pointerId);
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineWidth = Math.max(5, canvas.width / 120); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle = imageDrawMode === 'blur' ? 'rgba(10,10,15,.78)' : '#ff3158';
+    if (imageDrawMode === 'blur') { ctx.shadowColor = '#08080d'; ctx.shadowBlur = 14; }
+    else { ctx.shadowBlur = 0; }
+  }
+
+  function moveImageDraw(e) {
+    if (!imageDrawingRef.current) return;
+    const canvas = imageCanvasRef.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d'); const rect = canvas.getBoundingClientRect();
+    ctx.lineTo((e.clientX - rect.left) * canvas.width / rect.width, (e.clientY - rect.top) * canvas.height / rect.height); ctx.stroke();
+  }
+
+  async function sendEditedImage() {
+    if (!imageDraft || !supabase || !session) return;
     setMediaBusy(true);
     try {
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const path = `${session.user.id}/chat-${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
-      if (uploadError) throw uploadError;
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-      const sent = await insertChatBody(`__UPTRASID_IMAGE__:${data.publicUrl}`);
-      if (sent) setNotice('تم إرسال الصورة.');
-    } catch (err) {
-      const detail = err?.message || 'خطأ غير معروف';
-      setNotice(`تعذر رفع الصورة: ${detail}. لو ظهرت رسالة bucket أو policy، فالمشكلة في إعدادات Storage في Supabase وليست في شكل الصفحة.`);
-    } finally { setMediaBusy(false); }
+      const img = new Image(); img.src = imageDraft.url;
+      await new Promise((resolve,reject) => { if (img.complete && img.naturalWidth) resolve(); else { img.onload=resolve; img.onerror=reject; } });
+      let sx=0, sy=0, sw=img.naturalWidth, sh=img.naturalHeight;
+      if (imageRatio === 'square') { sw=sh=Math.min(img.naturalWidth,img.naturalHeight); sx=(img.naturalWidth-sw)/2; sy=(img.naturalHeight-sh)/2; }
+      if (imageRatio === 'landscape') { const ratio=16/9; if (sw/sh>ratio) { const nw=sh*ratio; sx=(sw-nw)/2; sw=nw; } else { const nh=sw/ratio; sy=(sh-nh)/2; sh=nh; } }
+      const out=document.createElement('canvas'); out.width=Math.round(sw); out.height=Math.round(sh); const ctx=out.getContext('2d');
+      ctx.filter=imageBlur?'blur(4px)':'none'; ctx.drawImage(img,sx,sy,sw,sh,0,0,out.width,out.height); ctx.filter='none';
+      const overlay=imageCanvasRef.current; if (overlay) ctx.drawImage(overlay,sx,sy,sw,sh,0,0,out.width,out.height);
+      if (imageText.trim()) { ctx.font=`bold ${Math.max(22,Math.round(out.width/18))}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.lineWidth=Math.max(3,out.width/220); ctx.strokeStyle='#000'; ctx.fillStyle='#fff'; const tx=imageText.trim().slice(0,120); ctx.strokeText(tx,out.width/2,out.height-22); ctx.fillText(tx,out.width/2,out.height-22); }
+      const blob=await new Promise(resolve=>out.toBlob(resolve,'image/jpeg',0.9)); if (!blob) throw new Error('تعذر تجهيز الصورة بعد التعديل');
+      const path=`${session.user.id}/chat-${Date.now()}.jpg`;
+      const {error:uploadError}=await supabase.storage.from('avatars').upload(path,blob,{upsert:false,contentType:'image/jpeg'}); if(uploadError) throw uploadError;
+      const {data}=supabase.storage.from('avatars').getPublicUrl(path);
+      const sent=await insertChatBody(`__UPTRASID_IMAGE__:${data.publicUrl}`);
+      if(sent){setNotice('تم إرسال الصورة بعد التعديل.');closeImageEditor();}
+    } catch(err) { setNotice(`تعذر إرسال الصورة: ${err?.message || 'خطأ غير معروف'}.`); }
+    finally { setMediaBusy(false); }
   }
 
   async function uploadAvatar(e) {
@@ -445,6 +491,22 @@ export default function App() {
     setProfile(prev => ({ ...prev, verified: true }));
     setNotice('تم توثيق حساب المالك.');
     await loadOwnerData();
+  }
+
+  async function createTraderAccount(e) {
+    e.preventDefault();
+    if (!supabase || !isOwner) return setNotice('إنشاء الحساب متاح للمالك فقط.');
+    const name=newTraderName.trim(), traderEmail=newTraderEmail.trim().toLowerCase();
+    if (!name || !traderEmail || newTraderPassword.length < 8) return setNotice('اكتب اسم التاجر والبريد وكلمة مرور من 8 أحرف على الأقل.');
+    setCreatingTrader(true); setNotice('جارٍ إنشاء حساب التاجر...');
+    try {
+      const {data,error}=await supabase.functions.invoke('owner-create-trader',{body:{displayName:name,email:traderEmail,password:newTraderPassword}});
+      if(error) throw new Error(error.message || 'تعذر الاتصال بوظيفة إنشاء الحساب');
+      if(data?.error) throw new Error(data.error);
+      setNewTraderName(''); setNewTraderEmail(''); setNewTraderPassword('');
+      setNotice('تم إنشاء حساب التاجر.'); await loadOwnerData();
+    } catch(err) { setNotice(`تعذر إنشاء الحساب: ${err?.message || 'خطأ غير معروف'}. تأكد أن وظيفة owner-create-trader منشورة في Supabase.`); }
+    finally { setCreatingTrader(false); }
   }
 
   async function approveTrader(id) {
@@ -519,12 +581,10 @@ export default function App() {
 
   return <div className="app-shell" dir="rtl">
     <header className="app-header glass">
-      <Brand compact />
       <div className="header-user">
         <button className="avatar-button" onClick={() => setTab('profile')} title="الملف الشخصي">
           {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : <UserRound size={19}/>}
         </button>
-        <span className="header-name">{profile?.display_name || 'حسابي'}{profile?.verified && <BadgeCheck size={14} className="verified-icon"/>}{isOwner && <Crown size={13}/>}</span>
         <button className="glass-icon" onClick={logout} title="تسجيل الخروج"><LogOut size={17}/></button>
       </div>
     </header>
@@ -538,7 +598,7 @@ export default function App() {
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.map(m => <article className={`message ${m.sender_id === session.user.id ? 'mine' : ''}`} key={m.id}>
             <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy"/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
+            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy" onError={e => { e.currentTarget.style.display='none'; setNotice('الصورة محفوظة كرابط لكن المتصفح لم يستطع عرضها؛ راجع أن bucket avatars عام وأن الرابط يعمل.'); }}/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
           </article>)}
           <div ref={bottomRef} />
         </div>
@@ -569,11 +629,37 @@ export default function App() {
 
       {tab === 'owner' && isOwner && <section className="owner-dashboard glass">
         <div className="dashboard-heading"><div><span className="eyebrow">OWNER CONTROL CENTER</span><h2>إدارة التجار</h2></div><button className="btn-secondary" onClick={loadOwnerData}>تحديث</button></div>
+        <form className="owner-create-form" onSubmit={createTraderAccount}>
+          <h3><UserPlus size={18} style={{verticalAlign:'middle',marginLeft:7}}/> إنشاء حساب تجاري</h3>
+          <input value={newTraderName} onChange={e=>setNewTraderName(e.target.value)} placeholder="اسم التاجر أو المتجر" required maxLength={80}/>
+          <input type="email" value={newTraderEmail} onChange={e=>setNewTraderEmail(e.target.value)} placeholder="البريد الإلكتروني للتاجر" required dir="ltr"/>
+          <input type="password" value={newTraderPassword} onChange={e=>setNewTraderPassword(e.target.value)} placeholder="كلمة مرور مؤقتة (8 أحرف على الأقل)" required minLength={8} dir="ltr"/>
+          <button className="btn-primary" type="submit" disabled={creatingTrader}>{creatingTrader ? <LoaderCircle className="spin" size={17}/> : <UserPlus size={17}/>} {creatingTrader ? 'جارٍ الإنشاء...' : 'إنشاء الحساب التجاري'}</button>
+        </form>
         <h3>طلبات الحسابات ({profiles.filter(p => p.role === 'trader' && p.status === 'pending').length})</h3>
         <div className="owner-list">{profiles.filter(p => p.role === 'trader').map(p => <div className="owner-row" key={p.id}><div><strong>{p.display_name}</strong><small>{p.status} · {p.verified ? 'موثّق' : 'غير موثّق'}</small></div><div className="owner-actions">{p.status === 'pending' ? <button className="mini-approve" onClick={() => approveTrader(p.id)}>قبول</button> : p.status === 'active' ? <button className="mini-reject" onClick={() => suspendTrader(p.id)}>إيقاف</button> : null}</div></div>)}</div>
         <h3>طلبات التوثيق ({verificationRequests.length})</h3>
         <div className="owner-list">{verificationRequests.map(req => <div className="owner-row" key={req.id}><div><strong>{req.profiles?.display_name || 'تاجر'}</strong><small>طلب توثيق · {new Date(req.created_at).toLocaleDateString('ar-EG')}</small></div><div className="owner-actions"><button className="mini-approve" onClick={() => reviewVerification(req, true)}>توثيق</button><button className="mini-reject" onClick={() => reviewVerification(req, false)}>رفض</button></div></div>)}</div>
       </section>}
+
+      {imageDraft && <div className="image-editor-backdrop" role="dialog" aria-modal="true" aria-label="تعديل الصورة قبل الإرسال">
+        <section className="image-editor">
+          <div className="image-editor-top"><strong>تعديل الصورة قبل الإرسال</strong><button className="btn-secondary" type="button" onClick={closeImageEditor}><X size={17}/> إلغاء</button></div>
+          <div className="image-editor-preview">
+            <img src={imageDraft.url} alt="معاينة الصورة" onLoad={e=>{const c=imageCanvasRef.current;if(c){c.width=e.currentTarget.naturalWidth;c.height=e.currentTarget.naturalHeight;}}} style={{filter:imageBlur?'blur(4px)':'none'}}/>
+            <canvas ref={imageCanvasRef} onPointerDown={beginImageDraw} onPointerMove={moveImageDraw} onPointerUp={()=>{imageDrawingRef.current=false;}} onPointerCancel={()=>{imageDrawingRef.current=false;}} />
+            {imageText.trim() && <span style={{position:'absolute',left:8,right:8,bottom:12,textAlign:'center',fontWeight:800,fontSize:22,color:'#fff',textShadow:'-2px -2px #000,2px 2px #000,0 0 8px #000',pointerEvents:'none'}}>{imageText}</span>}
+          </div>
+          <div className="image-editor-tools">
+            <select aria-label="مقاس الصورة" value={imageRatio} onChange={e=>setImageRatio(e.target.value)}><option value="original">المقاس الأصلي</option><option value="square">قص مربع 1:1</option><option value="landscape">قص عريض 16:9</option></select>
+            <button type="button" className={imageBlur?'selected':''} onClick={()=>setImageBlur(v=>!v)}><Eraser size={15}/> تشويش الصورة</button>
+            <button type="button" className={imageDrawMode==='pen'?'selected':''} onClick={()=>setImageDrawMode('pen')}><PenLine size={15}/> رسم / خط</button>
+            <button type="button" className={imageDrawMode==='blur'?'selected':''} onClick={()=>setImageDrawMode('blur')}><Eraser size={15}/> تشويش بالقلم</button>
+            <input value={imageText} onChange={e=>setImageText(e.target.value)} placeholder="اكتب نص يظهر على الصورة" maxLength={120}/>
+          </div>
+          <div className="image-editor-actions"><button type="button" className="btn-secondary" onClick={()=>{const c=imageCanvasRef.current;if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);setImageText('');setImageBlur(false);}}>مسح التعديلات</button><button type="button" className="btn-primary" onClick={sendEditedImage} disabled={mediaBusy}>{mediaBusy ? <LoaderCircle className="spin" size={17}/> : <Send size={17}/>} إرسال الصورة</button></div>
+        </section>
+      </div>}
 
       <nav className="bottom-dock glass" aria-label="التنقل الرئيسي">
         <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}><MessageCircle/><span>Chat</span></button>
