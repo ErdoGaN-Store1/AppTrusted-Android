@@ -129,23 +129,66 @@ export default function App() {
 
   async function submitAuth(e) {
     e.preventDefault();
-    if (!supabase) return setNotice('قاعدة البيانات غير مربوطة بعد. راجع ملف SETUP.md داخل الحزمة.');
-    setLoading(true);
-    setNotice('');
-    if (authMode === 'signup') {
-      const { error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: { data: { display_name: displayName.trim() } }
-      });
-      if (error) setNotice(`تعذر إرسال طلب الحساب: ${error.message}`);
-      else setNotice('وصل طلبك. الحساب سيظل قيد المراجعة حتى يوافق المالك. راجع بريدك لو طُلب تأكيده.');
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (error) setNotice(`بيانات الدخول غير صحيحة أو الحساب غير جاهز: ${error.message}`);
-      else setNotice('تم تسجيل الدخول.');
+    if (loading) return;
+    if (!supabase) {
+      setNotice('قاعدة البيانات غير متصلة. راجع إعدادات Supabase في GitHub Actions.');
+      return;
     }
-    setLoading(false);
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !password) {
+      setNotice('اكتب البريد الإلكتروني وكلمة المرور أولًا.');
+      return;
+    }
+
+    setLoading(true);
+    setNotice('جارٍ التحقق من بيانات الدخول...');
+    try {
+      if (authMode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password,
+          options: { data: { display_name: displayName.trim() } }
+        });
+        if (error) throw error;
+        setNotice('وصل طلبك. الحساب سيظل قيد المراجعة حتى يوافق المالك. راجع بريدك لو طُلب تأكيده.');
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password
+        });
+        if (error) throw error;
+
+        // Verify the selected role after authentication; never trust the UI selection alone.
+        const { data: account, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, role, status')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          await supabase.auth.signOut();
+          throw new Error(`تم تسجيل الدخول لكن تعذر قراءة ملف الحساب: ${profileError.message}`);
+        }
+        if (!account) {
+          await supabase.auth.signOut();
+          throw new Error('تم تسجيل الدخول لكن ملف الحساب غير موجود في profiles. راجع إعداد قاعدة البيانات.');
+        }
+        if (mode === 'owner' && !(account.role === 'owner' && account.status === 'active')) {
+          await supabase.auth.signOut();
+          throw new Error('الحساب ده مش مالك نشط. تأكد من role = owner وstatus = active.');
+        }
+        if (mode === 'trader' && account.role !== 'trader') {
+          await supabase.auth.signOut();
+          throw new Error('اختار «دخول المالك» لهذا الحساب.');
+        }
+        setNotice('تم التحقق من الحساب. جارٍ فتح الموقع...');
+      }
+    } catch (err) {
+      setNotice(`تعذر إكمال العملية: ${err?.message || 'خطأ غير معروف'}`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function logout() {
@@ -239,7 +282,7 @@ export default function App() {
         {authMode === 'signup' && <label>اسم التاجر<input value={displayName} onChange={e => setDisplayName(e.target.value)} required maxLength={80} placeholder="اسمك أو اسم المتجر" /></label>}
         <label>البريد الإلكتروني<input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="username" placeholder="name@example.com" dir="ltr" /></label>
         <label>كلمة المرور<input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} placeholder="8 أحرف على الأقل" dir="ltr" /></label>
-        <button className="btn-primary wide" disabled={loading}>{loading ? <LoaderCircle className="spin" size={18}/> : authMode === 'login' ? <LogIn size={18}/> : <Users size={18}/>} {loading ? 'لحظة واحدة...' : authMode === 'login' ? `دخول ${mode === 'owner' ? 'المالك' : 'التاجر'}` : 'إرسال طلب الحساب'}</button>
+        <button type="submit" className="btn-primary wide" disabled={loading}>{loading ? <LoaderCircle className="spin" size={18}/> : authMode === 'login' ? <LogIn size={18}/> : <Users size={18}/>} {loading ? 'لحظة واحدة...' : authMode === 'login' ? `دخول ${mode === 'owner' ? 'المالك' : 'التاجر'}` : 'إرسال طلب الحساب'}</button>
       </form>
       <div className="auth-switch">
         {authMode === 'login' ? <>لسه معندكش حساب؟ <button onClick={() => {setAuthMode('signup');setMode('trader');}} type="button">اطلب حساب تاجر</button></> :
