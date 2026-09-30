@@ -90,13 +90,24 @@ export default function App() {
     return () => { cancelled = true; };
   }, [session]);
 
+  const activeRoomRef = useRef(tab);
+  useEffect(() => { activeRoomRef.current = tab; }, [tab]);
+
   useEffect(() => {
-    if (!supabase || !session || !isActive) return;
-    loadMessages();
+    if (!supabase || !session || !isActive || !['orders', 'sales'].includes(tab)) return;
+    let disposed = false;
+    const refresh = () => { if (!disposed) loadMessages(tab); };
+    refresh();
+    // Poll as a fallback so messages still appear if Realtime is not enabled in Supabase.
+    const poll = setInterval(refresh, 3000);
     const channel = supabase.channel(`room-${tab}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'group_messages', filter: `room=eq.${tab}` }, loadMessages)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'group_messages', filter: `room=eq.${tab}` }, refresh)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      disposed = true;
+      clearInterval(poll);
+      supabase.removeChannel(channel);
+    };
   }, [session, isActive, tab]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages]);
@@ -106,25 +117,35 @@ export default function App() {
     loadOwnerData();
   }, [session, isOwner]);
 
-  async function loadMessages() {
-    if (!supabase) return;
+  async function loadMessages(room = tab) {
+    if (!supabase || !['orders', 'sales'].includes(room)) return;
     const { data, error } = await supabase.from('group_messages')
       .select('id, room, body, created_at, sender_id, profiles(display_name, avatar_url, verified)')
-      .eq('room', tab).order('created_at', { ascending: true }).limit(300);
-    if (error) setNotice(`تعذر تحميل الشات: ${error.message}`);
-    else setMessages(data || []);
+      .eq('room', room).order('created_at', { ascending: true }).limit(300);
+    if (error) {
+      if (activeRoomRef.current === room) setNotice(`تعذر تحميل الشات: ${error.message}`);
+    } else if (activeRoomRef.current === room) {
+      setMessages(data || []);
+    }
   }
 
   async function loadOwnerData() {
     if (!supabase || !isOwner) return;
+    // Fetch profiles and requests separately: the embedded profiles join is ambiguous
+    // because verification_requests has more than one relationship to profiles.
     const [p, v] = await Promise.all([
-      supabase.from('profiles').select('id, display_name, role, status, verified, created_at').order('created_at', { ascending: false }),
-      supabase.from('verification_requests').select('id, user_id, note, status, created_at, profiles(display_name, avatar_url)').eq('status', 'pending').order('created_at', { ascending: false })
+      supabase.from('profiles').select('id, display_name, role, status, verified, created_at, avatar_url').order('created_at', { ascending: false }),
+      supabase.from('verification_requests').select('id, user_id, note, status, created_at').eq('status', 'pending').order('created_at', { ascending: false })
     ]);
     if (p.error) setNotice(`تعذر تحميل طلبات التجار: ${p.error.message}`);
     else setProfiles(p.data || []);
-    if (v.error) setNotice(`تعذر تحميل طلبات التوثيق: ${v.error.message}`);
-    else setVerificationRequests(v.data || []);
+    if (v.error) {
+      setNotice(`تعذر تحميل طلبات التوثيق: ${v.error.message}`);
+      setVerificationRequests([]);
+    } else {
+      const profileById = new Map((p.data || []).map(item => [item.id, item]));
+      setVerificationRequests((v.data || []).map(req => ({ ...req, profiles: profileById.get(req.user_id) || null })));
+    }
   }
 
   async function submitAuth(e) {
@@ -205,7 +226,12 @@ export default function App() {
     const { error } = await supabase.from('group_messages').insert({
       room: tab, body, sender_id: session.user.id
     });
-    if (error) { setMessageText(body); setNotice(`لم تُرسل الرسالة: ${error.message}`); }
+    if (error) {
+      setMessageText(body);
+      setNotice(`لم تُرسل الرسالة: ${error.message}`);
+    } else {
+      await loadMessages(tab);
+    }
   }
 
   async function uploadAvatar(e) {
