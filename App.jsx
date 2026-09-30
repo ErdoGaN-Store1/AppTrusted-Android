@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   BadgeCheck, Camera, Check, CheckCircle2, ChevronLeft, CircleHelp, Crown,
   LogIn, LogOut, MessageCircle, Send, ShieldCheck, ShoppingBag, Store,
-  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile
+  UserRound, Users, X, ImagePlus, LockKeyhole, LoaderCircle, Sparkles, Smile, Mic, Square, Play, Trash2
 } from 'lucide-react';
 import { supabase } from './supabase.js';
 
@@ -50,6 +50,19 @@ const PREMIUM_CSS = `
 .auth-panel .btn-primary{background:linear-gradient(110deg,#fb7185,#a855d8 62%,#7154e8)!important;border-radius:14px!important}
 .owner-chat-tag,.media-status{display:inline-flex;align-items:center;gap:5px;color:#c4b5fd;font-size:10px}
 @media(max-width:520px){.app-shell .message{max-width:94%}.app-shell .emoji-panel{grid-template-columns:repeat(7,minmax(0,1fr))}.app-shell .chat-card{min-height:calc(100dvh - 170px)}.app-shell .messages-list{height:calc(100dvh - 340px);min-height:240px}}
+.app-shell .profile-cover{position:relative!important}
+.app-shell .profile-avatar{right:50%!important;transform:translateX(50%)!important;bottom:-48px!important;border-radius:50%!important;width:112px!important;height:112px!important}
+.app-shell .camera-button{right:calc(50% - 68px)!important;bottom:-37px!important}
+.app-shell .banner-upload{position:absolute;top:12px;left:12px;z-index:3;display:flex;align-items:center;gap:6px;background:#11111acc;border:1px solid #ffffff30;color:white;border-radius:12px;padding:9px 11px;font-size:12px;cursor:pointer}
+.app-shell .profile-socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.app-shell .social-chip{display:inline-flex;align-items:center;gap:7px;border-radius:13px;padding:9px 12px;text-decoration:none;color:white!important;font-size:12px;border:1px solid #ffffff20}
+.app-shell .social-editor{display:grid;grid-template-columns:1fr;gap:9px;padding:14px;margin-top:12px;background:#1b1825;border:1px solid #ffffff14;border-radius:16px}
+.app-shell .social-editor input,.app-shell .social-editor select{width:100%;padding:11px;border-radius:11px;background:#100d17;color:#fff;border:1px solid #393044}
+.app-shell .social-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.app-shell .audio-player{width:220px;max-width:100%;height:38px}
+.app-shell .recording-dot{color:#ff5475!important}
+@media(max-width:520px){.app-shell .profile-avatar{width:98px!important;height:98px!important;bottom:-43px!important}.app-shell .camera-button{right:calc(50% - 61px)!important;bottom:-34px!important}.app-shell .profile-body{padding-top:59px!important}}
+
 `;
 const ROOMS = [
   // Keep existing room key to preserve messages already stored in Supabase.
@@ -101,6 +114,14 @@ export default function App() {
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [myVerification, setMyVerification] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const [bannerBusy, setBannerBusy] = useState(false);
+  const [socialEditorOpen, setSocialEditorOpen] = useState(false);
+  const [socialPlatform, setSocialPlatform] = useState('WhatsApp');
+  const [socialValue, setSocialValue] = useState('');
+  const [socialLinks, setSocialLinks] = useState([]);
+  const [recording, setRecording] = useState(false);
+  const recorderRef = useRef(null);
+  const streamRef = useRef(null);
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
   const bottomRef = useRef(null);
@@ -129,7 +150,10 @@ export default function App() {
         .eq('id', session.user.id).maybeSingle();
       if (cancelled) return;
       if (error) setNotice(`تعذر تحميل الحساب: ${error.message}`);
-      setProfile(data || null);
+      const metadata = session.user.user_metadata || {};
+      const mergedProfile = data ? { ...data, banner_url: metadata.banner_url || '', social_links: Array.isArray(metadata.social_links) ? metadata.social_links : [] } : null;
+      setProfile(mergedProfile);
+      setSocialLinks(mergedProfile?.social_links || []);
       setEditName(data?.display_name || '');
       setEditBio(data?.bio || '');
     }
@@ -284,6 +308,77 @@ export default function App() {
 
   function addEmoji(emoji) { setMessageText(value => `${value}${emoji}`); }
 
+  async function uploadBanner(e) {
+    const file = e.target.files?.[0]; e.target.value = '';
+    if (!file || !supabase || !session) return;
+    if (!file.type.startsWith('image/')) return setNotice('اختار صورة بانر فقط.');
+    if (file.size > 6 * 1024 * 1024) return setNotice('حجم البانر لازم يكون أقل من 6 ميجابايت.');
+    setBannerBusy(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const path = `${session.user.id}/banner-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      const { error: metaError } = await supabase.auth.updateUser({ data: { ...(session.user.user_metadata || {}), banner_url: data.publicUrl } });
+      if (metaError) throw metaError;
+      setProfile(prev => ({ ...prev, banner_url: data.publicUrl }));
+      setNotice('تم تحديث البانر وحفظه في الحساب.');
+    } catch (err) {
+      setNotice(`تعذر رفع البانر: ${err?.message || 'خطأ غير معروف'}. تأكد من وجود Storage bucket باسم avatars وسياسات الرفع.`);
+    } finally { setBannerBusy(false); }
+  }
+
+  async function persistSocialLinks(nextLinks) {
+    const { error } = await supabase.auth.updateUser({ data: { ...(session.user.user_metadata || {}), social_links: nextLinks } });
+    if (error) { setNotice(`تعذر حفظ روابط التواصل: ${error.message}`); return false; }
+    setSocialLinks(nextLinks); setProfile(prev => ({ ...prev, social_links: nextLinks })); return true;
+  }
+
+  async function addSocialLink() {
+    const value = socialValue.trim();
+    if (!value) return setNotice('اكتب رابط الحساب أو رقم واتساب أولًا.');
+    const links = socialLinks.filter(item => item.platform !== socialPlatform);
+    links.push({ platform: socialPlatform, value });
+    if (await persistSocialLinks(links)) { setSocialValue(''); setSocialEditorOpen(false); setNotice('تم حفظ وسيلة التواصل.'); }
+  }
+
+  async function removeSocialLink(platform) {
+    if (await persistSocialLinks(socialLinks.filter(item => item.platform !== platform))) setNotice('تم حذف وسيلة التواصل.');
+  }
+
+  async function startVoiceRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') return setNotice('تسجيل الصوت غير مدعوم في المتصفح ده. افتح الموقع من متصفح حديث وباتصال آمن HTTPS.');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      recorderRef.current = recorder;
+      const chunks = [];
+      recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(track => track.stop()); streamRef.current = null; setRecording(false);
+        const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+        if (!blob.size) return setNotice('التسجيل الصوتي فارغ، جرّب مرة تانية.');
+        if (blob.size > 12 * 1024 * 1024) return setNotice('التسجيل طويل جدًا؛ سجّل رسالة أقصر من 12 ميجابايت.');
+        setMediaBusy(true);
+        try {
+          const ext = (blob.type.includes('mp4') ? 'm4a' : 'webm');
+          const path = `${session.user.id}/voice-${Date.now()}.${ext}`;
+          const { error } = await supabase.storage.from('avatars').upload(path, blob, { upsert: false, contentType: blob.type || 'audio/webm' });
+          if (error) throw error;
+          const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+          const sent = await insertChatBody(`__UPTRASID_AUDIO__:${data.publicUrl}`);
+          if (sent) setNotice('تم إرسال الرسالة الصوتية.');
+        } catch (err) { setNotice(`تعذر إرسال التسجيل: ${err?.message || 'خطأ غير معروف'}. راجع صلاحيات Storage.`); }
+        finally { setMediaBusy(false); }
+      };
+      recorder.start(); setRecording(true); setNotice('التسجيل شغال؛ اضغط الزر الأحمر لإيقافه وإرساله.');
+    } catch (err) { setNotice(`لم نقدر نفتح الميكروفون: ${err?.message || 'تأكد من السماح باستخدام الميكروفون.'}`); }
+  }
+
+  function stopVoiceRecording() { if (recorderRef.current && recorderRef.current.state !== 'inactive') recorderRef.current.stop(); }
+
   async function uploadChatImage(e) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -384,7 +479,7 @@ export default function App() {
     <div className="auth-panel glass">
       <Brand />
       <div className="auth-kicker"><LockKeyhole size={14} /> مساحة خاصة للتجار المعتمدين</div>
-      <h1>{authMode === 'login' ? 'أهلاً بعودتك' : 'طلب حساب تاجر'}</h1>
+      <h1>{authMode === 'login' ? 'أهلاً بعودتك' : 'إنشاء حساب تجاري'}</h1>
       <p className="auth-description">{authMode === 'login' ? 'سجّل دخولك للوصول إلى مجتمع App Trusted.' : 'أنشئ طلبك؛ لن تتمكن من دخول الشات حتى يوافق المالك.'}</p>
       <div className="role-tabs">
         <button className={mode === 'owner' ? 'selected' : ''} onClick={() => setMode('owner')} type="button"><Crown size={17}/> دخول المالك</button>
@@ -397,7 +492,7 @@ export default function App() {
         <button type="submit" className="btn-primary wide" disabled={loading}>{loading ? <LoaderCircle className="spin" size={18}/> : authMode === 'login' ? <LogIn size={18}/> : <Users size={18}/>} {loading ? 'لحظة واحدة...' : authMode === 'login' ? `دخول ${mode === 'owner' ? 'المالك' : 'التاجر'}` : 'إرسال طلب الحساب'}</button>
       </form>
       <div className="auth-switch">
-        {authMode === 'login' ? <>لسه معندكش حساب؟ <button onClick={() => {setAuthMode('signup');setMode('trader');}} type="button">اطلب حساب تاجر</button></> :
+        {authMode === 'login' ? <>لسه معندكش حساب؟ <button onClick={() => {setAuthMode('signup');setMode('trader');}} type="button">إنشاء حساب تجاري</button></> :
           <>عندك حساب بالفعل؟ <button onClick={() => setAuthMode('login')} type="button">تسجيل الدخول</button></>}
       </div>
       <div className="whatsapp-help">
@@ -429,7 +524,7 @@ export default function App() {
         <button className="avatar-button" onClick={() => setTab('profile')} title="الملف الشخصي">
           {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : <UserRound size={19}/>}
         </button>
-        <span className="header-name">{profile?.display_name || 'تاجر'}{profile?.verified && <BadgeCheck size={14} className="verified-icon"/>}{isOwner && <Crown size={13}/>}</span>
+        <span className="header-name">{profile?.display_name || 'حسابي'}{profile?.verified && <BadgeCheck size={14} className="verified-icon"/>}{isOwner && <Crown size={13}/>}</span>
         <button className="glass-icon" onClick={logout} title="تسجيل الخروج"><LogOut size={17}/></button>
       </div>
     </header>
@@ -443,7 +538,7 @@ export default function App() {
           {messages.length === 0 && <div className="empty-chat"><MessageCircle size={29}/><strong>ابدأ المحادثة</strong><span>أول رسالة هنا هتظهر لكل التجار المفعّلين في نفس الشات.</span></div>}
           {messages.map(m => <article className={`message ${m.sender_id === session.user.id ? 'mine' : ''}`} key={m.id}>
             <div className="message-avatar">{m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} alt="" /> : (m.profiles?.display_name || 'ت').slice(0,1)}</div>
-            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy"/></a> : <p>{m.body}</p>}</div>
+            <div className="message-content"><div className="message-meta"><strong>{m.profiles?.display_name || 'تاجر'} {m.profiles?.verified && <BadgeCheck size={14} className="verified-icon"/>}</strong><time>{new Date(m.created_at).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}</time></div>{typeof m.body === 'string' && m.body.startsWith('__UPTRASID_IMAGE__:') ? <a href={m.body.slice('__UPTRASID_IMAGE__:'.length)} target="_blank" rel="noreferrer"><img className="message-photo" src={m.body.slice('__UPTRASID_IMAGE__:'.length)} alt="صورة مرسلة في الشات" loading="lazy"/></a> : typeof m.body === 'string' && m.body.startsWith('__UPTRASID_AUDIO__:') ? <audio className="audio-player" controls preload="metadata" src={m.body.slice('__UPTRASID_AUDIO__:'.length)} /> : <p>{m.body}</p>}</div>
           </article>)}
           <div ref={bottomRef} />
         </div>
@@ -451,20 +546,23 @@ export default function App() {
         <div className="composer-tools">
           <button className="composer-tool" type="button" onClick={() => setEmojiOpen(value => !value)} title="الإيموجي" aria-label="فتح لوحة الإيموجي"><Smile size={19}/></button>
           <label className="composer-tool" title="إرسال صورة" aria-label="إرسال صورة"><ImagePlus size={19}/><input type="file" accept="image/*" onChange={uploadChatImage} hidden disabled={mediaBusy}/></label>
-          {mediaBusy && <span className="media-status"><LoaderCircle size={14} className="spin"/> جارٍ رفع الصورة</span>}
+          <button className={`composer-tool ${recording ? 'recording-dot' : ''}`} type="button" onClick={recording ? stopVoiceRecording : startVoiceRecording} title={recording ? 'إيقاف التسجيل وإرساله' : 'تسجيل رسالة صوتية'} aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوت'}>{recording ? <Square size={17} fill="currentColor"/> : <Mic size={19}/>}</button>
+          {mediaBusy && <span className="media-status"><LoaderCircle size={14} className="spin"/> جارٍ رفع الملف</span>}
         </div>
         <form className="send-form" onSubmit={sendMessage}><input value={messageText} onChange={e => setMessageText(e.target.value)} maxLength={4000} placeholder="اكتب رسالتك..." /><button className="send-button" disabled={!messageText.trim()} aria-label="إرسال"><Send size={19}/></button></form>
         <div className="retention-note">المحادثة الجماعية · الرسائل محفوظة في قاعدة البيانات.</div>
       </section>}
 
       {tab === 'profile' && <section className="profile-card glass">
-        <div className="profile-cover"><div className="profile-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="الصورة الشخصية"/> : <UserRound size={38}/>}</div>
+        <div className="profile-cover" style={profile?.banner_url ? {backgroundImage: `linear-gradient(0deg,#09091035,transparent),url(${profile.banner_url})`, backgroundSize:'cover', backgroundPosition:'center'} : undefined}><label className="banner-upload" title="رفع بانر">{bannerBusy ? <LoaderCircle size={15} className="spin"/> : <ImagePlus size={15}/>} {bannerBusy ? 'جارٍ الرفع' : 'إضافة بانر'}<input type="file" accept="image/*" onChange={uploadBanner} hidden disabled={bannerBusy}/></label><div className="profile-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="الصورة الشخصية"/> : <UserRound size={38}/>}</div>
           <label className="camera-button" title="تغيير الصورة">{avatarBusy ? <LoaderCircle className="spin"/> : <Camera size={17}/>}<input type="file" accept="image/*" onChange={uploadAvatar} hidden /></label>
         </div>
-        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'تاجر'} · {profile?.verified ? 'حساب موثّق' : 'غير موثّق'}</p>
+        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'عضو'} · {profile?.verified ? 'حساب موثّق' : 'حساب غير موثّق'}</p>
           <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
           {isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={verifyOwnerSelf}><BadgeCheck size={17}/> توثيق حساب المالك</button>}
           {!isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={requestVerification}><BadgeCheck size={17}/> طلب توثيق الحساب</button>}
+          <div className="profile-socials">{socialLinks.map(link => { const value = link.value || ''; const clean = value.replace(/^@/, ''); const href = value.startsWith('http') ? value : link.platform === 'WhatsApp' ? `https://wa.me/${value.replace(/[^0-9]/g, '')}` : link.platform === 'Telegram' ? `https://t.me/${clean}` : link.platform === 'TikTok' ? `https://www.tiktok.com/@${clean}` : link.platform === 'Facebook' ? `https://www.facebook.com/${clean}` : `https://www.instagram.com/${clean}`; const colors = { WhatsApp:'#168b52', Telegram:'#168fca', TikTok:'#24212d', Facebook:'#1769d2', Instagram:'#a53a9a' }; return <a key={link.platform} className="social-chip" style={{background:colors[link.platform] || '#343044'}} href={href} target="_blank" rel="noreferrer">{link.platform === 'WhatsApp' ? '🟢' : link.platform === 'Telegram' ? '✈️' : link.platform === 'TikTok' ? '♪' : link.platform === 'Facebook' ? 'f' : '◎'} {link.platform}</a>; })}</div>
+          <div className="social-editor"><button type="button" className="btn-secondary" onClick={() => setSocialEditorOpen(value => !value)}>{socialEditorOpen ? 'إغلاق' : '＋ إضافة موقع للتواصل'}</button>{socialEditorOpen && <><div className="social-row"><select value={socialPlatform} onChange={e => setSocialPlatform(e.target.value)}><option>WhatsApp</option><option>Telegram</option><option>TikTok</option><option>Facebook</option><option>Instagram</option></select><input value={socialValue} onChange={e => setSocialValue(e.target.value)} placeholder={socialPlatform === 'WhatsApp' ? 'رقم دولي بدون +' : 'رابط حسابك أو اسم المستخدم'} dir="ltr" /></div><button type="button" className="btn-primary" onClick={addSocialLink}>حفظ وسيلة التواصل</button></>}{socialLinks.length > 0 && <div className="social-row">{socialLinks.map(link => <button type="button" key={link.platform} className="btn-secondary" onClick={() => removeSocialLink(link.platform)}><Trash2 size={14}/> حذف {link.platform}</button>)}</div>}</div>
           <p className="disclaimer">التوثيق يوضح أن المالك راجع الحساب فقط، ولا يمثل ضمانًا بنسبة 100% لأي صفقة.</p>
         </div>
       </section>}
