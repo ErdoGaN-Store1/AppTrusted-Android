@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-        steps:
+    steps:
       - name: Get source
         uses: actions/checkout@v4
 
