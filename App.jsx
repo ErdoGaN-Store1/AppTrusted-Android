@@ -185,6 +185,23 @@ const PREMIUM_CSS = `
 .app-shell .group-settings-modal{width:min(100%,430px);max-height:92dvh;overflow:auto;border:1px solid #a78bfa4d;border-radius:27px;background:linear-gradient(155deg,#211832,#100d18);box-shadow:0 25px 80px #000b;color:#f8f4ff;padding:16px}
 .app-shell .group-settings-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.app-shell .group-settings-top strong{font-size:16px}.app-shell .group-modal-back{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#ffffff0a;border:1px solid #ffffff18;color:#e4d9ff}.app-shell .group-settings-photo-wrap{display:flex;align-items:center;gap:15px;padding:12px 0 18px;border-bottom:1px solid #ffffff13;margin-bottom:16px}.app-shell .group-settings-photo{width:82px;height:82px;flex:0 0 82px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:linear-gradient(145deg,#4c326d,#21182f);border:2px solid #a78bfa88;color:#d9ccff}.app-shell .group-settings-photo img{width:100%;height:100%;object-fit:cover}.app-shell .group-photo-change{display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border-radius:13px;background:#7957f522;border:1px solid #a78bfa55;color:#e7deff;font-size:12px;cursor:pointer}.app-shell .group-settings-form{display:grid;gap:13px}.app-shell .group-settings-form label{display:grid;gap:7px;font-size:12px;color:#d8cfff}.app-shell .group-settings-form input,.app-shell .group-settings-form textarea{width:100%;min-width:0;box-sizing:border-box;border:1px solid #ffffff19;border-radius:13px;background:#100d19;color:#fff;padding:12px;font:inherit;font-size:14px;outline:none}.app-shell .group-settings-form input:focus,.app-shell .group-settings-form textarea:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #7957f522}.app-shell .group-settings-form input:disabled,.app-shell .group-settings-form textarea:disabled{opacity:.82}.app-shell .group-settings-form .btn-primary{display:flex;align-items:center;justify-content:center;gap:8px;min-height:45px}.app-shell .group-settings-hint{font-size:12px;color:#bdb1d5;line-height:1.8}
 @media(max-width:520px){.app-shell .group-chat-heading{padding:10px!important;gap:7px!important}.app-shell .group-heading-avatar{width:43px!important;height:43px!important;flex-basis:43px!important}.app-shell .group-heading-copy strong{font-size:13px!important}.app-shell .group-back-button,.app-shell .group-info-button{width:36px!important;height:36px!important;flex-basis:36px!important}.app-shell .chat-composer{padding-inline:7px!important}.app-shell .telegram-composer{gap:4px!important;padding:6px!important}.app-shell .telegram-composer .composer-tool,.app-shell .telegram-composer .send-button{flex-basis:35px!important;width:35px!important;min-width:35px!important;height:35px!important;min-height:35px!important}}
+/* Final fixes: reactions stay attached to bubbles; action sheet never gets clipped; voice notes use dark violet controls. */
+.app-shell .message{overflow:visible!important;min-width:0!important;row-gap:2px!important}
+.app-shell .message-content{overflow:visible!important;min-width:0!important;max-width:calc(100% - 38px)!important}
+.app-shell .message-reactions{position:relative!important;z-index:3!important;display:flex!important;flex:0 0 calc(100% - 38px)!important;width:calc(100% - 38px)!important;max-width:calc(100% - 38px)!important;box-sizing:border-box!important;flex-wrap:wrap!important;justify-content:flex-start!important;align-self:flex-start!important;order:4!important;margin:3px 38px 5px 0!important;gap:5px!important;overflow:visible!important}
+.app-shell .message.mine .message-reactions{justify-content:flex-end!important;margin:3px 0 5px 38px!important}
+.app-shell .reaction-chip{position:relative!important;z-index:4!important;min-height:28px!important;padding:3px 9px!important;white-space:nowrap!important;cursor:pointer!important}
+.app-shell .message-action-popover,.app-shell .message.mine .message-action-popover{position:fixed!important;left:50%!important;right:auto!important;top:auto!important;bottom:calc(180px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(360px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;max-height:min(58dvh,460px)!important;overflow-y:auto!important;z-index:10050!important;box-sizing:border-box!important;box-shadow:0 20px 65px #000c!important}
+.app-shell .message-action-popover .quick-reactions{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important}
+.app-shell .message-action-popover .quick-reactions button{width:100%!important;min-width:0!important;height:42px!important;font-size:22px!important}
+.app-shell .audio-message-wrap{width:min(230px,100%)!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;padding:8px!important;border:1px solid #a78bfa42!important;border-radius:14px!important;background:linear-gradient(145deg,#261d3b,#171321)!important;box-sizing:border-box!important}
+.app-shell audio.audio-player{display:block!important;width:100%!important;max-width:100%!important;height:38px!important;color-scheme:dark!important;accent-color:#9b70ff!important;background:#261d3b!important;border-radius:10px!important;filter:none!important}
+.app-shell audio.audio-player::-webkit-media-controls-panel{background-color:#2b2141!important;color:#f5efff!important}
+.app-shell .group-heading-main{min-width:0!important}
+.app-shell .group-heading-avatar{position:relative!important;overflow:hidden!important;isolation:isolate!important}
+.app-shell .group-heading-avatar img{display:block!important;position:absolute!important;inset:0!important}
+.app-shell .username-field-hint{font-size:11px!important;color:#b9afd0!important;line-height:1.7!important}.app-shell .profile-username-display{display:inline-flex!important;direction:ltr!important;align-items:center!important;margin:7px 0!important;padding:5px 10px!important;border-radius:999px!important;background:#7957f51a!important;border:1px solid #a78bfa33!important;color:#cbbcff!important;font-size:12px!important;max-width:100%!important;overflow-wrap:anywhere!important}
+@media(max-width:520px){.app-shell .message-action-popover,.app-shell .message.mine .message-action-popover{bottom:calc(180px + env(safe-area-inset-bottom))!important}.app-shell .audio-message-wrap{width:min(205px,100%)!important}.app-shell .message-reactions{flex-basis:calc(100% - 32px)!important;width:calc(100% - 32px)!important;max-width:calc(100% - 32px)!important;margin-right:32px!important}.app-shell .message.mine .message-reactions{margin-right:0!important;margin-left:32px!important}}
 `;
 const ROOMS = [
   // Keep existing room key to preserve messages already stored in Supabase.
@@ -275,6 +292,7 @@ export default function App() {
   const recorderRef = useRef(null);
   const streamRef = useRef(null);
   const [editName, setEditName] = useState('');
+  const [editUsername, setEditUsername] = useState('');
   const [editBio, setEditBio] = useState('');
   const bottomRef = useRef(null);
   const messagesListRef = useRef(null);
@@ -301,7 +319,7 @@ export default function App() {
     async function loadProfile() {
       if (!supabase || !session?.user) { setProfile(null); return; }
       const { data, error } = await supabase.from('profiles')
-        .select('id, display_name, role, status, verified, avatar_url, bio, created_at')
+        .select('id, display_name, username, role, status, verified, avatar_url, bio, created_at')
         .eq('id', session.user.id).maybeSingle();
       if (cancelled) return;
       if (error) setNotice(`تعذر تحميل الحساب: ${error.message}`);
@@ -310,6 +328,7 @@ export default function App() {
       setProfile(mergedProfile);
       setSocialLinks(mergedProfile?.social_links || []);
       setEditName(data?.display_name || '');
+      setEditUsername(data?.username || '');
       setEditBio(data?.bio || '');
     }
     loadProfile();
@@ -827,11 +846,22 @@ export default function App() {
 
   async function saveProfile(e) {
     e.preventDefault();
+    const username = editUsername.trim().replace(/^@/, '').toLowerCase();
+    if (!/^[a-z0-9_]{5,15}$/.test(username)) {
+      setNotice('اسم المستخدم لازم يكون من 5 إلى 15 حرفًا أو رقمًا إنجليزيًا، ومسموح بالشرطة السفلية _ فقط.');
+      return;
+    }
     const { error } = await supabase.from('profiles').update({
-      display_name: editName.trim(), bio: editBio.trim()
+      display_name: editName.trim(), username, bio: editBio.trim()
     }).eq('id', session.user.id);
-    if (error) setNotice(`تعذر حفظ الملف الشخصي: ${error.message}`);
-    else { setProfile(prev => ({ ...prev, display_name: editName.trim(), bio: editBio.trim() })); setNotice('تم حفظ الملف الشخصي.'); }
+    if (error) {
+      if (error.code === '23505' || /duplicate|unique/i.test(error.message || '')) setNotice('اسم المستخدم ده مستخدم بالفعل؛ اختار اسمًا مختلفًا.');
+      else if (/username/i.test(error.message || '') || /column .* does not exist/i.test(error.message || '')) setNotice('لازم تنفّذ ملف SQL الخاص باسم المستخدم مرة واحدة في Supabase أولًا.');
+      else setNotice(`تعذر حفظ الملف الشخصي: ${error.message}`);
+    } else {
+      setProfile(prev => ({ ...prev, display_name: editName.trim(), username, bio: editBio.trim() }));
+      setNotice('تم حفظ الملف الشخصي واسم المستخدم.');
+    }
   }
 
   async function requestVerification() {
@@ -1018,8 +1048,8 @@ export default function App() {
         <div className="profile-cover" style={profile?.banner_url ? {backgroundImage: `linear-gradient(0deg,#09091035,transparent),url(${profile.banner_url})`, backgroundSize:'cover', backgroundPosition:'center'} : undefined}><label className="banner-upload" title="رفع بانر">{bannerBusy ? <LoaderCircle size={15} className="spin"/> : <ImagePlus size={15}/>} {bannerBusy ? 'جارٍ الرفع' : 'إضافة بانر'}<input type="file" accept="image/*" onChange={uploadBanner} hidden disabled={bannerBusy}/></label><div className="profile-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="الصورة الشخصية"/> : <UserRound size={38}/>}</div>
           <label className="camera-button" title="تغيير الصورة">{avatarBusy ? <LoaderCircle className="spin"/> : <Camera size={17}/>}<input type="file" accept="image/*" onChange={uploadAvatar} hidden /></label>
         </div>
-        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'عضو'} · {profile?.verified ? 'حساب موثّق' : 'حساب غير موثّق'}</p>
-          <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
+        <div className="profile-body"><span className="eyebrow">YOUR PROFILE</span><h2>{profile?.display_name || 'حسابي'} {profile?.verified && <BadgeCheck className="verified-icon"/>}</h2><p className="muted">{isOwner ? 'المالك' : profile?.verified ? 'تاجر موثق' : 'عضو'} · {profile?.verified ? 'حساب موثّق' : 'حساب غير موثّق'}</p><p className="profile-username-display" dir="ltr">@{profile?.username || 'username'}</p>
+          <form onSubmit={saveProfile} className="profile-form"><label>الاسم<input value={editName} onChange={e => setEditName(e.target.value)} maxLength={80} required /></label><label>اسم المستخدم<input value={editUsername} onChange={e => setEditUsername(e.target.value.replace(/[^a-zA-Z0-9_@]/g, '').replace(/^@+/, '').slice(0,15))} minLength={5} maxLength={15} autoCapitalize="none" autoCorrect="off" spellCheck={false} dir="ltr" placeholder="username_123" required /><span className="username-field-hint">من 5 إلى 15 حرفًا إنجليزيًا أو رقمًا، ومسموح بالشرطة السفلية _. لازم يكون فريدًا وغير مستخدم من شخص آخر.</span></label><label>نبذة عنك<textarea value={editBio} onChange={e => setEditBio(e.target.value)} maxLength={500} placeholder="اكتب نبذة بسيطة عن نشاطك التجاري" /></label><button className="btn-primary"><Check size={17}/> حفظ التعديلات</button></form>
           {isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={verifyOwnerSelf}><BadgeCheck size={17}/> توثيق حساب المالك</button>}
           {!isOwner && !profile?.verified && <button className="btn-secondary verify-request" onClick={requestVerification}><BadgeCheck size={17}/> طلب توثيق الحساب</button>}
           <div className="profile-socials">{socialLinks.map(link => { const value = link.value || ''; const clean = value.replace(/^@/, ''); const href = value.startsWith('http') ? value : link.platform === 'WhatsApp' ? `https://wa.me/${value.replace(/[^0-9]/g, '')}` : link.platform === 'Telegram' ? `https://t.me/${clean}` : link.platform === 'TikTok' ? `https://www.tiktok.com/@${clean}` : link.platform === 'Facebook' ? `https://www.facebook.com/${clean}` : `https://www.instagram.com/${clean}`; const colors = { WhatsApp:'#168b52', Telegram:'#168fca', TikTok:'#24212d', Facebook:'#1769d2', Instagram:'#a53a9a' }; return <a key={link.platform} className="social-chip" style={{background:colors[link.platform] || '#343044'}} href={href} target="_blank" rel="noreferrer">{link.platform === 'WhatsApp' ? '🟢' : link.platform === 'Telegram' ? '✈️' : link.platform === 'TikTok' ? '♪' : link.platform === 'Facebook' ? 'f' : '◎'} {link.platform}</a>; })}</div>
