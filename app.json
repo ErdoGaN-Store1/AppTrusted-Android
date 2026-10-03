@@ -4,8 +4,13 @@
     "slug": "app-trusted-android",
     "version": "1.0.0",
     "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "android": {
-      "package": "com.erdogan.apptrusted"
-    }
+      "package": "com.erdogan.apptrusted",
+      "adaptiveIcon": {
+        "backgroundColor": "#171126"
+      }
+    },
+    "plugins": []
   }
 }
