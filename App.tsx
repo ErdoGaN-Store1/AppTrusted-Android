@@ -1,82 +1,219 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Session } from '@supabase/supabase-js';
-import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { supabase } from './src/supabase';
+import React, { useState } from "react";
+import {
+  SafeAreaView, View, Text, TextInput, TouchableOpacity,
+  FlatList, StyleSheet, KeyboardAvoidingView, Platform
+} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
 
-const PURPLE = '#9B7BFF';
-const BG = '#100C1B';
-const PANEL = '#1C162B';
+type Screen = "splash" | "login" | "home" | "chat" | "merchant";
 
-type Profile = { display_name?: string | null; role?: string | null; status?: string | null; username?: string | null };
-type ChatMessage = { id: string | number; sender_id: string; body: string; created_at?: string };
+const chats = [
+  { id: "1", name: "Ahmed Store", message: "أهلاً بك في App Trusted", time: "14:30", unread: 2 },
+  { id: "2", name: "محمد للتجارة", message: "تم إرسال الطلب", time: "13:18", unread: 0 },
+  { id: "3", name: "خدمة العملاء", message: "كيف يمكننا مساعدتك؟", time: "12:02", unread: 0 },
+];
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [draft, setDraft] = useState('');
-  const [sending, setSending] = useState(false);
+  const [screen, setScreen] = useState<Screen>("splash");
+  const [role, setRole] = useState<"owner" | "merchant" | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [selectedChat, setSelectedChat] = useState(chats[0]);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([
+    { id: "1", text: "أهلاً بك في App Trusted 👋", mine: false },
+    { id: "2", text: "دي النسخة التجريبية للمحادثات.", mine: false },
+  ]);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setLoading(false); });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
-    return () => listener.subscription.unsubscribe();
+  React.useEffect(() => {
+    const timer = setTimeout(() => setScreen("login"), 1600);
+    return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (!session?.user) { setProfile(null); setMessages([]); return; }
-    let active = true;
-    (async () => {
-      const { data } = await supabase.from('profiles').select('display_name, role, status, username').eq('id', session.user.id).maybeSingle();
-      if (active) setProfile((data as Profile | null) ?? null);
-      // Read only the existing group_messages table. If your deployed schema differs,
-      // this screen reports the database error instead of silently changing your schema.
-      const result = await supabase.from('group_messages').select('id, sender_id, body, created_at').eq('room_key', 'orders').order('created_at', { ascending: true }).limit(100);
-      if (active && !result.error) setMessages((result.data ?? []) as ChatMessage[]);
-      if (active && result.error) console.warn('Group messages could not be loaded:', result.error.message);
-    })();
-    return () => { active = false; };
-  }, [session?.user?.id]);
+  if (screen === "splash") return (
+    <SafeAreaView style={styles.splash}>
+      <StatusBar style="light" />
+      <View style={styles.logoCircle}><Ionicons name="shield-checkmark" size={48} color="#fff" /></View>
+      <Text style={styles.logo}>App Trusted</Text>
+      <Text style={styles.tagline}>تواصل بثقة</Text>
+    </SafeAreaView>
+  );
 
-  async function signIn() {
-    if (!email.trim() || !password) { Alert.alert('بيانات ناقصة', 'اكتب البريد الإلكتروني وكلمة المرور.'); return; }
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setBusy(false);
-    if (error) Alert.alert('تعذر تسجيل الدخول', error.message);
-  }
+  if (screen === "login") return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <View style={styles.loginWrap}>
+        <View style={styles.smallLogo}><Ionicons name="shield-checkmark" size={30} color="#fff" /></View>
+        <Text style={styles.title}>مرحباً بك في App Trusted</Text>
+        <Text style={styles.subtitle}>اختر طريقة الدخول</Text>
 
-  async function sendMessage() {
-    const body = draft.trim();
-    if (!body || !session?.user || sending) return;
-    setSending(true);
-    const { data, error } = await supabase.from('group_messages').insert({ room_key: 'orders', sender_id: session.user.id, body }).select('id, sender_id, body, created_at').single();
-    setSending(false);
-    if (error) { Alert.alert('لم تُرسل الرسالة', error.message); return; }
-    if (data) setMessages(prev => [...prev, data as ChatMessage]);
-    setDraft('');
-  }
+        <TouchableOpacity style={styles.primaryButton} onPress={() => { setRole("merchant"); setScreen("merchant"); }}>
+          <Ionicons name="storefront-outline" size={21} color="#fff" />
+          <Text style={styles.primaryText}>دخول التاجر</Text>
+        </TouchableOpacity>
 
-  if (loading) return <SafeAreaView style={styles.center}><ActivityIndicator color={PURPLE} size="large"/><Text style={styles.muted}>جاري فتح App Trusted…</Text></SafeAreaView>;
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => { setRole("owner"); setScreen("merchant"); }}>
+          <Ionicons name="shield-outline" size={21} color="#0B7A62" />
+          <Text style={styles.secondaryText}>دخول المالك</Text>
+        </TouchableOpacity>
 
-  if (!session) return <SafeAreaView style={styles.safe}><ExpoStatusBar style="light"/><KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView contentContainerStyle={styles.loginWrap} keyboardShouldPersistTaps="handled">
-    <View style={styles.logo}><Text style={styles.logoMark}>✓</Text></View><Text style={styles.brand}>App Trusted</Text><Text style={styles.egypt}>ERDOGAN 🇪🇬</Text><Text style={styles.subtitle}>مساحة التجار الخاصة</Text>
-    <View style={styles.card}><Text style={styles.heading}>تسجيل الدخول</Text><Text style={styles.label}>البريد الإلكتروني</Text><TextInput value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="name@example.com" placeholderTextColor="#8D849F" style={styles.input}/><Text style={styles.label}>كلمة المرور</Text><TextInput value={password} onChangeText={setPassword} secureTextEntry placeholder="كلمة المرور" placeholderTextColor="#8D849F" style={styles.input}/><Pressable onPress={signIn} disabled={busy} style={styles.primary}>{busy ? <ActivityIndicator color="white"/> : <Text style={styles.primaryText}>دخول</Text>}</Pressable><Text style={styles.hint}>استخدم حسابك الحالي؛ لن ينشئ التطبيق حسابًا جديدًا.</Text></View>
-  </ScrollView></KeyboardAvoidingView></SafeAreaView>;
+        <TouchableOpacity style={styles.linkButton}>
+          <Text style={styles.linkText}>إنشاء حساب تجاري</Text>
+        </TouchableOpacity>
 
-  return <SafeAreaView style={styles.safe}><ExpoStatusBar style="light"/><View style={styles.header}><View style={styles.groupAvatar}><Text style={styles.avatarText}>AT</Text></View><View style={styles.headerText}><Text style={styles.brandSmall}>App Trusted</Text><Text style={styles.mutedSmall}>شات تجار ترستد</Text></View><Pressable onPress={() => Alert.alert('الحساب', profile?.display_name || session.user.email || 'حسابي', [{text:'تسجيل الخروج', style:'destructive', onPress:()=>supabase.auth.signOut()},{text:'إلغاء',style:'cancel'}])} style={styles.logout}><Text style={styles.logoutText}>خروج</Text></Pressable></View>
-    <View style={styles.notice}><Text style={styles.noticeText}>نسخة Android التجريبية — بنبدأ بتوصيل الحساب والشات</Text></View>
-    <ScrollView style={styles.flex} contentContainerStyle={styles.chatList} ref={ref => { (globalThis as any).__trustedChatScroll = ref; }} onContentSizeChange={() => { const ref=(globalThis as any).__trustedChatScroll; ref?.scrollToEnd?.({animated:true}); }}>
-      {messages.map(m => { const mine = m.sender_id === session.user.id; return <View key={String(m.id)} style={[styles.bubble, mine ? styles.mine : styles.theirs]}><Text style={styles.messageText}>{m.body}</Text><Text style={styles.time}>{m.created_at ? new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</Text></View>; })}
-      {messages.length === 0 && <View style={styles.empty}><Text style={styles.emptyTitle}>أهلًا بيك في App Trusted</Text><Text style={styles.muted}>لو الرسائل لم تظهر، سنراجع توافق جدول الجروب وصلاحياته قبل أي تعديل.</Text></View>}
-    </ScrollView>
-    <View style={styles.composer}><TextInput value={draft} onChangeText={setDraft} placeholder="اكتب رسالة…" placeholderTextColor="#958BA8" style={styles.messageInput} multiline/><Pressable onPress={sendMessage} disabled={sending || !draft.trim()} style={[styles.send, (!draft.trim() || sending) && styles.disabled]}><Text style={styles.sendText}>➤</Text></Pressable></View>
-  </SafeAreaView>;
+        <View style={styles.contactBox}>
+          <Text style={styles.contactTitle}>للتواصل وإنشاء حساب تجاري</Text>
+          <Text style={styles.contactText}>واتساب: ضع رقم التواصل هنا</Text>
+          <Text style={styles.contactText}>سيتم إضافة رابط واتساب هنا</Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+
+  if (screen === "merchant") return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <View style={styles.authHeader}>
+          <TouchableOpacity onPress={() => setScreen("login")}><Ionicons name="arrow-back" size={25} color="#111" /></TouchableOpacity>
+          <Text style={styles.authHeaderTitle}>{role === "owner" ? "دخول المالك" : "دخول التاجر"}</Text>
+        </View>
+        <View style={styles.authBody}>
+          <Text style={styles.authTitle}>تسجيل الدخول</Text>
+          <Text style={styles.label}>البريد الإلكتروني</Text>
+          <TextInput value={email} onChangeText={setEmail} placeholder="example@email.com" autoCapitalize="none" keyboardType="email-address" style={styles.input} />
+          <Text style={styles.label}>كلمة المرور</Text>
+          <TextInput value={password} onChangeText={setPassword} placeholder="••••••••" secureTextEntry style={styles.input} />
+          <TouchableOpacity style={styles.primaryButton} onPress={() => setScreen("home")}>
+            <Text style={styles.primaryText}>متابعة</Text>
+          </TouchableOpacity>
+          <Text style={styles.note}>النسخة التجريبية: التحقق الحقيقي وOTP سيتم ربطهما بالـBackend.</Text>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+
+  if (screen === "chat") return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <View style={styles.chatHeader}>
+        <TouchableOpacity onPress={() => setScreen("home")}><Ionicons name="arrow-back" size={25} color="#111" /></TouchableOpacity>
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.chatName}>{selectedChat.name}</Text>
+          <Text style={styles.online}>متصل الآن</Text>
+        </View>
+        <Ionicons name="videocam-outline" size={24} color="#111" />
+        <Ionicons name="call-outline" size={23} color="#111" style={{ marginLeft: 18 }} />
+      </View>
+      <FlatList
+        style={{ flex: 1, backgroundColor: "#E9DED5" }}
+        contentContainerStyle={{ padding: 14 }}
+        data={messages}
+        keyExtractor={(m) => m.id}
+        renderItem={({ item }) => (
+          <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
+            <Text style={styles.bubbleText}>{item.text}</Text>
+          </View>
+        )}
+      />
+      <View style={styles.composer}>
+        <Ionicons name="happy-outline" size={24} color="#657078" />
+        <TextInput value={message} onChangeText={setMessage} placeholder="اكتب رسالة" style={styles.messageInput} />
+        <TouchableOpacity onPress={() => {
+          if (!message.trim()) return;
+          setMessages([...messages, { id: String(Date.now()), text: message.trim(), mine: true }]);
+          setMessage("");
+        }}>
+          <Ionicons name={message.trim() ? "send" : "mic"} size={24} color="#0B7A62" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <View style={styles.homeHeader}>
+        <Text style={styles.homeTitle}>App Trusted</Text>
+        <View style={styles.headerIcons}>
+          <Ionicons name="search-outline" size={23} color="#111" />
+          <Ionicons name="ellipsis-vertical" size={22} color="#111" style={{ marginLeft: 18 }} />
+        </View>
+      </View>
+      <View style={styles.tabs}>
+        <Text style={styles.activeTab}>الدردشات</Text>
+        <Text style={styles.tab}>التحديثات</Text>
+        <Text style={styles.tab}>المكالمات</Text>
+      </View>
+      <FlatList
+        data={chats}
+        keyExtractor={(c) => c.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.chatRow} onPress={() => { setSelectedChat(item); setScreen("chat"); }}>
+            <View style={styles.avatar}><Text style={styles.avatarText}>{item.name.charAt(0)}</Text></View>
+            <View style={{ flex: 1 }}>
+              <View style={styles.rowTop}><Text style={styles.chatRowName}>{item.name}</Text><Text style={styles.time}>{item.time}</Text></View>
+              <View style={styles.rowBottom}><Text style={styles.preview}>{item.message}</Text>{item.unread > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{item.unread}</Text></View>}</View>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+      <TouchableOpacity style={styles.fab}><Ionicons name="chatbubble" size={25} color="#fff" /></TouchableOpacity>
+    </SafeAreaView>
+  );
 }
 
-const styles = StyleSheet.create({safe:{flex:1,backgroundColor:BG},flex:{flex:1},center:{flex:1,backgroundColor:BG,alignItems:'center',justifyContent:'center',gap:12},loginWrap:{flexGrow:1,justifyContent:'center',padding:24,paddingTop:48,paddingBottom:48},logo:{width:76,height:76,borderRadius:25,backgroundColor:'#30224A',borderWidth:1,borderColor:'#7055B9',alignItems:'center',justifyContent:'center',alignSelf:'center',marginBottom:12},logoMark:{color:'#C9B8FF',fontSize:42,fontWeight:'800'},brand:{color:'#F7F3FF',fontSize:30,fontWeight:'800',textAlign:'center'},egypt:{color:'#BDAAFF',fontWeight:'700',textAlign:'center',marginTop:4,letterSpacing:1},subtitle:{color:'#A69BB9',textAlign:'center',marginTop:10,marginBottom:28},card:{backgroundColor:PANEL,borderRadius:24,padding:20,borderWidth:1,borderColor:'#342847'},heading:{color:'#F6F1FF',fontSize:22,fontWeight:'700',textAlign:'right',marginBottom:20},label:{color:'#D8CFF0',textAlign:'right',marginBottom:7,marginTop:8},input:{backgroundColor:'#100C1B',borderColor:'#3B2D52',borderWidth:1,borderRadius:14,paddingHorizontal:14,paddingVertical:13,color:'white',textAlign:'left'},primary:{backgroundColor:PURPLE,borderRadius:14,padding:15,alignItems:'center',marginTop:22,minHeight:50,justifyContent:'center'},primaryText:{color:'white',fontWeight:'800',fontSize:16},hint:{color:'#8D849F',fontSize:12,textAlign:'center',marginTop:14},muted:{color:'#9B91AB',textAlign:'center',lineHeight:21},header:{height:72,flexDirection:'row',alignItems:'center',paddingHorizontal:16,borderBottomColor:'#30253F',borderBottomWidth:1,gap:11},groupAvatar:{width:44,height:44,borderRadius:22,backgroundColor:'#39275B',alignItems:'center',justifyContent:'center',borderWidth:1,borderColor:'#8062CE'},avatarText:{color:'#E1D7FF',fontWeight:'900'},headerText:{flex:1},brandSmall:{color:'#F6F1FF',fontSize:17,fontWeight:'800'},mutedSmall:{color:'#9D91B2',fontSize:12,marginTop:2},logout:{borderWidth:1,borderColor:'#4A3B61',borderRadius:12,paddingHorizontal:12,paddingVertical:8},logoutText:{color:'#D8C9FF',fontWeight:'700'},notice:{paddingHorizontal:14,paddingVertical:9,backgroundColor:'#1D1630'},noticeText:{color:'#BFB0E9',textAlign:'center',fontSize:11},chatList:{padding:14,gap:10,flexGrow:1,justifyContent:'flex-end'},bubble:{maxWidth:'84%',paddingHorizontal:14,paddingVertical:10,borderRadius:18,borderWidth:1},mine:{alignSelf:'flex-end',backgroundColor:'#4C3477',borderColor:'#6B4CA2',borderBottomRightRadius:5},theirs:{alignSelf:'flex-start',backgroundColor:'#211B2D',borderColor:'#3B304D',borderBottomLeftRadius:5},messageText:{color:'#F7F2FF',fontSize:15,lineHeight:22},time:{color:'#C5B5E2',fontSize:10,marginTop:5,textAlign:'right'},empty:{alignSelf:'center',marginTop:60,backgroundColor:'#1B1527',borderColor:'#352846',borderWidth:1,borderRadius:20,padding:20,maxWidth:300,gap:8},emptyTitle:{color:'#F2ECFF',fontSize:17,fontWeight:'700',textAlign:'center'},composer:{flexDirection:'row',alignItems:'flex-end',gap:9,padding:12,borderTopColor:'#30253F',borderTopWidth:1,backgroundColor:'#151020'},messageInput:{flex:1,maxHeight:110,minHeight:46,backgroundColor:'#241B35',borderRadius:18,borderWidth:1,borderColor:'#45335F',color:'white',paddingHorizontal:15,paddingVertical:12,textAlign:'right'},send:{width:46,height:46,borderRadius:16,backgroundColor:PURPLE,alignItems:'center',justifyContent:'center'},sendText:{color:'white',fontSize:23,fontWeight:'800'},disabled:{opacity:0.45},empty2:{},});
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  splash: { flex: 1, backgroundColor: "#0B141A", alignItems: "center", justifyContent: "center" },
+  logoCircle: { width: 92, height: 92, borderRadius: 46, backgroundColor: "#0B7A62", alignItems: "center", justifyContent: "center" },
+  logo: { color: "#fff", fontSize: 30, fontWeight: "800", marginTop: 20 },
+  tagline: { color: "#B6C1C7", fontSize: 15, marginTop: 8 },
+  loginWrap: { padding: 24, flex: 1, justifyContent: "center" },
+  smallLogo: { width: 58, height: 58, borderRadius: 29, backgroundColor: "#0B7A62", alignItems: "center", justifyContent: "center", alignSelf: "center", marginBottom: 18 },
+  title: { fontSize: 25, fontWeight: "800", textAlign: "center", color: "#111" },
+  subtitle: { textAlign: "center", color: "#69747A", marginTop: 8, marginBottom: 28 },
+  primaryButton: { height: 52, borderRadius: 14, backgroundColor: "#0B7A62", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 12 },
+  primaryText: { color: "#fff", fontWeight: "800", fontSize: 16 },
+  secondaryButton: { height: 52, borderRadius: 14, borderWidth: 1, borderColor: "#0B7A62", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 12 },
+  secondaryText: { color: "#0B7A62", fontWeight: "800", fontSize: 16 },
+  linkButton: { alignItems: "center", padding: 18 },
+  linkText: { color: "#0B7A62", fontWeight: "700" },
+  contactBox: { marginTop: 10, padding: 16, backgroundColor: "#F4F7F6", borderRadius: 14 },
+  contactTitle: { fontWeight: "800", color: "#111", marginBottom: 7 },
+  contactText: { color: "#56636A", marginTop: 3 },
+  authHeader: { height: 60, flexDirection: "row", alignItems: "center", paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  authHeaderTitle: { fontSize: 18, fontWeight: "800", marginLeft: 22 },
+  authBody: { padding: 24, marginTop: 20 },
+  authTitle: { fontSize: 28, fontWeight: "800", marginBottom: 25 },
+  label: { fontWeight: "700", marginBottom: 7, marginTop: 14 },
+  input: { height: 52, borderWidth: 1, borderColor: "#D5DADC", borderRadius: 12, paddingHorizontal: 14, fontSize: 16 },
+  note: { textAlign: "center", color: "#7A858B", fontSize: 12, marginTop: 18, lineHeight: 18 },
+  homeHeader: { paddingHorizontal: 18, paddingTop: 12, paddingBottom: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  homeTitle: { fontSize: 24, fontWeight: "800" },
+  headerIcons: { flexDirection: "row" },
+  tabs: { flexDirection: "row", justifyContent: "space-around", borderBottomWidth: 1, borderBottomColor: "#eee", paddingBottom: 10 },
+  activeTab: { color: "#0B7A62", fontWeight: "800" },
+  tab: { color: "#657078", fontWeight: "700" },
+  chatRow: { flexDirection: "row", paddingHorizontal: 16, paddingVertical: 13, alignItems: "center" },
+  avatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: "#D8E8E3", alignItems: "center", justifyContent: "center", marginRight: 13 },
+  avatarText: { color: "#0B7A62", fontSize: 22, fontWeight: "800" },
+  rowTop: { flexDirection: "row", justifyContent: "space-between" },
+  chatRowName: { fontSize: 16, fontWeight: "800" },
+  time: { color: "#7C878C", fontSize: 12 },
+  rowBottom: { flexDirection: "row", alignItems: "center", marginTop: 5 },
+  preview: { color: "#657078", flex: 1 },
+  badge: { width: 22, height: 22, borderRadius: 11, backgroundColor: "#0B7A62", alignItems: "center", justifyContent: "center" },
+  badgeText: { color: "#fff", fontSize: 11, fontWeight: "800" },
+  fab: { position: "absolute", right: 20, bottom: 20, width: 58, height: 58, borderRadius: 29, backgroundColor: "#0B7A62", alignItems: "center", justifyContent: "center", elevation: 6 },
+  chatHeader: { height: 62, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  chatName: { fontWeight: "800", fontSize: 16 },
+  online: { color: "#0B7A62", fontSize: 12, marginTop: 2 },
+  bubble: { maxWidth: "80%", paddingHorizontal: 13, paddingVertical: 9, borderRadius: 14, marginBottom: 8 },
+  mine: { backgroundColor: "#D8F0E7", alignSelf: "flex-end", borderTopRightRadius: 4 },
+  theirs: { backgroundColor: "#fff", alignSelf: "flex-start", borderTopLeftRadius: 4 },
+  bubbleText: { fontSize: 15, color: "#182025" },
+  composer: { minHeight: 60, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, gap: 10, borderTopWidth: 1, borderTopColor: "#eee", backgroundColor: "#fff" },
+  messageInput: { flex: 1, backgroundColor: "#F3F5F5", borderRadius: 22, paddingHorizontal: 16, paddingVertical: 9, fontSize: 15 }
+});

@@ -1,16 +1,15 @@
 {
   "expo": {
     "name": "App Trusted",
-    "slug": "app-trusted-android",
+    "slug": "app-trusted",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "android": {
-      "package": "com.erdogan.apptrusted",
-      "adaptiveIcon": {
-        "backgroundColor": "#171126"
-      }
+      "package": "com.apptrusted.messenger"
     },
-    "plugins": []
+    "splash": {
+      "backgroundColor": "#0B141A"
+    }
   }
 }
